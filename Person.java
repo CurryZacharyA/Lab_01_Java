@@ -16,33 +16,35 @@ public class Person {
     //Constructor
     public Person() {
         //Data Fields
-        FirstName = null;
-        LastName = null;
-        MiddleInitial = null;
+        FirstName = "";
+        LastName = "";
+        MiddleInitial = "";
         HouseNumber = 0;
-        Street = null;
-        CityCounty = null;
-        StateAbb = null;
-        CountryAbb = null;
-        ZipCode = null;
-        LastUpdatedBy = null;
-        LastUpdated = null;
+        Street = "";
+        CityCounty = "";
+        StateAbb = "";
+        CountryAbb = "";
+        ZipCode = "";
+        LastUpdatedBy = "";
+        LastUpdated = "";
     }
     //Create Overload methods....
     //Create Overload methods....
     //Create Overload methods....
     //Create Overload methods....
-    //Create Overload methods....
+    //Create Overload methods....?
     
     //Setter Methods
-    public void setFirstName(String firstNamePassed){
+    public void setFirstName(String firstNamePassed){       //Required
         this.FirstName = firstNamePassed;
     }
-    public void setLastName(String lastNamePassed){
+    public void setLastName(String lastNamePassed){         //Required
         this.LastName = lastNamePassed;
     }
     public void setMiddleInitial(String middleInitialPassed){
-        this.MiddleInitial = middleInitialPassed;
+        if (middleInitialPassed.equals(""))
+            this.MiddleInitial = "NULL";
+        else this.MiddleInitial = middleInitialPassed;
     }
     public void setHouseNumber(int houseNumberPassed){
         this.HouseNumber = houseNumberPassed;

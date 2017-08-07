@@ -1191,13 +1191,14 @@ public class Lab1 extends Application{
             }
             arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
             arrayContractor[i].setFirstName(tfCFirstName.getText());
+            arrayContractor[i].setMiddleInitial(tfCMI.getText());
             
             
-            if ("".equals(tfCMI.getText()))
-                    arrayContractor[i].setMiddleInitial("NULL");
-                else arrayContractor[i].setMiddleInitial(tfCMI.getText());
+            
+            
         }
     }
+    
     
     public void assignContractorValues(){
         //Start at first free location in Contractor Array
@@ -1211,9 +1212,29 @@ public class Lab1 extends Application{
                 //Assign FirstName TextField to Contractor Array
                 //arrayContractor[i].setFirstName(tfCFirstName.getText());
                 //Assign MiddleInitial TextField to Contractor Array
-                if ("".equals(tfCMI.getText()))
-                    arrayContractor[i].setMiddleInitial("NULL");
-                else arrayContractor[i].setMiddleInitial(tfCMI.getText());
+                //if ("".equals(tfCMI.getText()))
+                  //  arrayContractor[i].setMiddleInitial("NULL");
+                //else arrayContractor[i].setMiddleInitial(tfCMI.getText());
+                
+                
+                /*
+                
+                
+                
+                
+                
+                LEFT OFF HERE
+                
+                
+                
+                
+                */
+                
+                
+                
+                
+                
+                
                 //Assign LastName TextField to Contractor Array
                 arrayContractor[i].setLastName(tfCLastName.getText());                    
                 //Assign HouseNumber TextField to Contractor Array
