@@ -1184,7 +1184,7 @@ public class Lab1 extends Application{
         }
         return false;
     }
-    public void assignContractorValuesPerson(){
+    public void assignContractorPersonValues(){
         for (int i=0; i<arrayContractor.length; i++){
             if (arrayContractor[i] == null){
                 arrayContractor[i] = new Contractor();
