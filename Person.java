@@ -25,7 +25,6 @@ public class Person {
         StateAbb = null;
         CountryAbb = null;
         ZipCode = null;
-        Fee = null;
         LastUpdatedBy = null;
         LastUpdated = null;
     }
@@ -63,9 +62,6 @@ public class Person {
     public void setZipCode(String zipCodePassed){
         this.ZipCode = zipCodePassed;
     }
-    public void setFee(Double feePassed){
-        this.Fee = feePassed;
-    }
     public void setLastUpdatedBy(String lastUpdatedByPassed){
         this.LastUpdatedBy = lastUpdatedByPassed;
     }
@@ -100,9 +96,6 @@ public class Person {
     }
     public String getZipCode(){
         return this.ZipCode;
-    }
-    public Double getFee(){ 
-        return this.Fee;
     }
     public String getLastUpdatedBy(){
         return this.LastUpdatedBy;

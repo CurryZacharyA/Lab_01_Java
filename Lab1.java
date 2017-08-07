@@ -40,8 +40,8 @@ public class Lab1 extends Application{
     String userPASS = "javapass";
     
     //Create Arrays
-    Integer arraySize = 3;
-    Contractor[] arrayContractor = new Contractor[arraySize];
+    final int FIXED_ARRAY_SIZE = 3;
+    Contractor[] arrayContractor = new Contractor[FIXED_ARRAY_SIZE];
     String stateList[] = new String[5];
     String countryList[] = new String[5];
     ArrayList<String> driverContractorList = new ArrayList();
@@ -703,7 +703,7 @@ public class Lab1 extends Application{
         if ("NULL".equals(arrayContractor[i].getMiddleInitial()))
             sqlQuery += arrayContractor[i].getMiddleInitial()+ ", ";
         else sqlQuery += "'" + arrayContractor[i].getMiddleInitial() + "', ";
-        if (arrayContractor[i].HouseNumber == null)
+        if (arrayContractor[i].HouseNumber == 0)
             sqlQuery += "NULL, ";
         else sqlQuery += "'" + arrayContractor[i].getHouseNumber().toString() + "', ";
         if ("NULL".equals(arrayContractor[i].getStreet()))
@@ -721,7 +721,7 @@ public class Lab1 extends Application{
         if ("NULL".equals(arrayContractor[i].getZipCode()))
             sqlQuery += arrayContractor[i].getZipCode() + ", ";
         else sqlQuery += "'" + arrayContractor[i].getZipCode() + "', ";
-        if (arrayContractor[i].Fee == null)
+        if (arrayContractor[i].Fee == 0)
             sqlQuery += "NULL, ";
         else sqlQuery += "'" + arrayContractor[i].getFee().toString() + "', ";
         sqlQuery += "'" + arrayContractor[i].getLastUpdatedBy() + "', ";
@@ -843,7 +843,8 @@ public class Lab1 extends Application{
         olCountryList = FXCollections.observableArrayList(countryList);
     }
     
-    public void loadPersonFromDB(String localSqlQuery, ArrayList<String> localArrayList){
+    public void loadPersonFromDB(String localSqlQuery, ArrayList<String>
+            localArrayList){
         try{
             localArrayList.clear();
             while (dbResults.next()){
@@ -860,16 +861,16 @@ public class Lab1 extends Application{
     
     public void loadContractorIDFromDB(){
         //populate contractors into contractor dropdown
-        loadPersonFromDB("SELECT CONTRACTORID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
-                        + "FROM CONTRACTOR", driverContractorList);
-            olContractorID = FXCollections.observableArrayList(driverContractorList);
+        loadPersonFromDB("SELECT CONTRACTORID, FIRSTNAME, LASTNAME, "
+                + "MIDDLEINITIAL FROM CONTRACTOR", driverContractorList);
+        olContractorID = FXCollections.observableArrayList(driverContractorList);
     }
     
     public void loadDriverIDFromDB(){
         //populate drivers on driver dropdown
         loadPersonFromDB("SELECT DRIVERID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
-                            + "FROM DRIVER", equipmentDriverList);
-            olDriverID = FXCollections.observableArrayList(equipmentDriverList);
+                + "FROM DRIVER", equipmentDriverList);
+        olDriverID = FXCollections.observableArrayList(equipmentDriverList);
     }
     
     public void commitContractor(){
@@ -1106,7 +1107,7 @@ public class Lab1 extends Application{
             tfCUpdatedBy.requestFocus();
         }
         //Check to see if Contractor array last location is empty
-        else if (arrayContractor[arraySize-1] != null){
+        else if (arrayContractor[FIXED_ARRAY_SIZE-1] != null){
             Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Contractor Array is Full!");
             alert.setContentText("You must commit the Contractor Array \n"
@@ -1183,6 +1184,20 @@ public class Lab1 extends Application{
         }
         return false;
     }
+    public void assignContractorValuesPerson(){
+        for (int i=0; i<arrayContractor.length; i++){
+            if (arrayContractor[i] == null){
+                arrayContractor[i] = new Contractor();
+            }
+            arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
+            arrayContractor[i].setFirstName(tfCFirstName.getText());
+            
+            
+            if ("".equals(tfCMI.getText()))
+                    arrayContractor[i].setMiddleInitial("NULL");
+                else arrayContractor[i].setMiddleInitial(tfCMI.getText());
+        }
+    }
     
     public void assignContractorValues(){
         //Start at first free location in Contractor Array
@@ -1191,10 +1206,10 @@ public class Lab1 extends Application{
                 //Check to see if location is free, if not move to next location in array
                 if (arrayContractor[i] == null){
                     //Create Contractor object in Contractor Array
-                    arrayContractor[i] = new Contractor();
-                arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
+                    //arrayContractor[i] = new Contractor();
+                //arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
                 //Assign FirstName TextField to Contractor Array
-                arrayContractor[i].setFirstName(tfCFirstName.getText());
+                //arrayContractor[i].setFirstName(tfCFirstName.getText());
                 //Assign MiddleInitial TextField to Contractor Array
                 if ("".equals(tfCMI.getText()))
                     arrayContractor[i].setMiddleInitial("NULL");
@@ -1203,7 +1218,7 @@ public class Lab1 extends Application{
                 arrayContractor[i].setLastName(tfCLastName.getText());                    
                 //Assign HouseNumber TextField to Contractor Array
                 if ("".equals(tfCHouseNumber.getText()))
-                    arrayContractor[i].HouseNumber = null;
+                    arrayContractor[i].HouseNumber = 0;
                 else arrayContractor[i].setHouseNumber(Integer.parseInt(tfCHouseNumber.getText()));
                 //Assign Street TextField to Contractor Array
                 if ("".equals(tfCStreet.getText()))
@@ -1231,7 +1246,7 @@ public class Lab1 extends Application{
                 }
                 //Assign Fee TextField to Contractor Array
                 if ("".equals(tfCFee.getText()))
-                    arrayContractor[i].Fee = null;
+                    arrayContractor[i].Fee = 0;
                 else arrayContractor[i].setFee(Double.parseDouble(tfCFee.getText()));
                 //Assign UpdatedBy TextField to Contractor Array
                 if ("".equals(tfCUpdatedBy.getText()))
