@@ -293,6 +293,217 @@ public class Lab1 extends Application{
         primaryStage.show();
     }
     
+    public static void main(String[] args) {
+        Application.launch(args);   
+    }
+    
+    public void loadFromDB(String localSqlQuery, String localArray[]){
+        try{
+            int i = 0;
+            sendDBCommand(localSqlQuery);
+            while (dbResults.next()){
+                localArray[i] = dbResults.getString(1);
+                i++;
+            }
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
+    }                //looks good
+    
+    public void loadFromDB(String localSqlQuery, ArrayList<String> localArrayList){
+        try{
+            localArrayList.clear();
+            while (dbResults.next()){
+                String nameConcatenated = null;
+                nameConcatenated = dbResults.getString(1);
+                nameConcatenated += " - " + dbResults.getString(2);
+                if (dbResults.getString(4) != null)
+                    nameConcatenated += " " + dbResults.getString(4);
+                nameConcatenated += " " + dbResults.getString(3);
+                localArrayList.add(nameConcatenated);
+            }
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
+    }   //looks good
+
+    public void loadStatesDataFromDB(){
+        //Populate states into dropdowns
+        Lab1.this.loadFromDB("SELECT STATEABB FROM JAVAUSER.HOMESTATE", stateList);
+        olStateList = FXCollections.observableArrayList(stateList);
+    }                                               //looks good
+    
+    public void loadCountriesDataFromDB(){
+        //populate countries into dropdowns
+        Lab1.this.loadFromDB("SELECT COUNTRYABB FROM JAVAUSER.COUNTRY", countryList);
+        olCountryList = FXCollections.observableArrayList(countryList);
+    }                                           //looks good
+    
+    public void insertButtonContractor(){
+        //Check to see if ContractorID Field Empty
+        if ("".equals(tfContractorID.getText())){
+            popUpAlert("Contractor ID can't be empty", "Please enter a Contractor ID", tfContractorID);
+        }
+        //Check to see if ContractorID fits into an integer constraint
+        else if (tfContractorID.getText().length() > 10){
+            popUpAlert("Contractor ID Too Long", "Only 10 characters allowed for a Contractor ID", tfContractorID);
+        }
+        //Check to see if ContractorID is a number; acknowledge the max integer constraint
+        else if (isInteger(tfContractorID.getText()) == false){
+            popUpAlert("Contractor ID must be an integer", "Please enter an number for Contractor ID\n"
+                    + "\n"
+                    + "Contractor ID must be less than 2,147,483,648", tfContractorID);
+        }
+        //Check to see if ContractorID is a positive number
+        else if (Integer.parseInt(tfContractorID.getText()) < 0){
+            popUpAlert("Contractor ID Negative", "Contractor ID must be a positive number", tfContractorID);
+        }
+        //Check to see if FirstName is left blank
+        else if("".equals(tfCFirstName.getText())){
+            popUpAlert("No First Name Specified", "First Name can't be left blank", tfCFirstName);
+        }
+        //Check to see if FirstName length is less than 20
+        else if (tfCFirstName.getText().length() > 20){
+            popUpAlert("First Name Too Long", "Only 20 characters allowed for a First Name", tfCFirstName);
+        }
+        //Check to see if MI is only 1 character
+        else if (tfCMI.getText().length() > 1){
+            popUpAlert("Middle Initial Too Long", "Only 1 character allowed for a Middle Initial", tfCMI);
+        }
+        //Check to see if LastName is left blank
+        else if("".equals(tfCLastName.getText())){
+            popUpAlert("No Last Name Specified", "Last Name can't be left blank", tfCLastName);
+        }
+        //Check to see if LastName is less than 20
+        else if (tfCLastName.getText().length() > 20){
+            popUpAlert("Last Name Too Long", "Only 20 characters allowed for a Last Name", tfCLastName);
+        }
+        //Check to see if Fee is a double IF the field is not empty
+        else if(isDouble(tfCFee.getText()) == false && !"".equals(tfCFee.getText())){
+            popUpAlert("Fee must be a double", "Please enter a numeric amount for Fee", tfCFee);
+        }
+        //Check to see if Fee is a positive number
+        else if(isDouble(tfCFee.getText()) == true && !"".equals(tfCFee.getText()) &&
+                Double.parseDouble(tfCFee.getText()) < 0){
+            popUpAlert("Fee must be a positive value", "Please enter a positive value for Fee", tfCFee);
+        }
+        //Check to see if Fee field contains a decimal point AND IF SO
+        //...check to make sure it only contains 2 decimal places or less
+        else if (tfCFee.getText().contains(".") == true && tfCFee.getText().substring(tfCFee.getText().indexOf("."),
+                    tfCFee.getText().length()).length() > 3){
+            popUpAlert("Fee has too many decimal places", "Please reduce amount of decimal places for the Fee", tfCFee);
+        }
+        //Check to see if Fee falls within Decimal (8,2) constraints
+        else if (tfCFee.getText().contains(".") == true && tfCFee.getText().substring(1,
+                    tfCFee.getText().indexOf(".")).length() > 6){
+            popUpAlert("Fee Too Long", "Fee must be less than $1,000,000.00", tfCFee);
+        }
+        //Check to see if Fee is less than $1,000,000.00
+        else if (tfCFee.getText().contains(".") == false &&
+                    tfCFee.getText().length() > 6){
+            popUpAlert("Fee Too Long", "Fee must be less than $1,000,000.00", tfCFee);
+        }
+        //Check to see if House Number fits into an integer constraint
+        else if (tfCHouseNumber.getText().length() > 10){
+            popUpAlert("House Number Too Long", "Only 10 characters allowed for a House Number", tfCHouseNumber);
+        }
+        //Check to see if House number is a number; acknowledge the max integer constraint
+        else if(isInteger(tfCHouseNumber.getText()) == false && !"".equals(tfCHouseNumber.getText())){
+            popUpAlert("House Number must be an integer", "Please enter a number for House Number\n"
+                    + "\n"
+                    + "House Number must be less than 2,147,483,648", tfCHouseNumber);
+        }
+        //Check to see if Street is less than 50 characters
+        else if (tfCStreet.getText().length() > 50){
+            popUpAlert("Street Too Long", "Only 50 characters allowed for a Street", tfCStreet);
+        }
+        //Check to see if City or County is less than 40 characters
+        else if (tfCCityCounty.getText().length() > 40){
+            popUpAlert("City / County Too Long", "Only 40 characters allowed for a City or County", tfCCityCounty);
+        }
+        //Check to see if ZipCode is greater than 5 characters
+        else if (tfCZipCode.getText().length() > 5){
+            popUpAlert("Zip Code Too Long", "Only 5 characters allowed for a Zip Code", tfCZipCode);
+        }
+        //Check to see if ZipCode is less than 5 characters
+        else if (!"".equals(tfCZipCode.getText()) && tfCZipCode.getText().length() < 5){
+            popUpAlert("Zip Code Too Short", "Zip Code must have 5 characters", tfCZipCode);
+        }
+        //Check to see if ZipCode is a number IF the field is not empty
+        else if(isInteger(tfCZipCode.getText()) == false && !"".equals(tfCZipCode.getText())){
+            popUpAlert("Zip Code must be an integer", "Please enter a number for Zip Code", tfCZipCode);
+        }
+        //Check to see if UpdatedBy is null
+        else if("".equals(tfCUpdatedBy.getText())){
+            popUpAlert("No Ownership to Update Specified", "Please write your name in the \"Updated By\" box", tfCUpdatedBy);
+        }
+        //Check to see if UpdatedBy is less than 20 characters
+        else if (tfCUpdatedBy.getText().length()> 20){
+            popUpAlert("Updated By Too Long", "Only 20 characters allowed for an Updated By Ownership", tfCUpdatedBy);
+        }
+        //Check to see if Contractor array last location is empty
+        else if (arrayContractor[FIXED_ARRAY_SIZE-1] != null){
+            popUpAlert("Contractor Array is Full!", "You must commit the Contractor Array \n"
+                    + "before adding a new Contractor!", tfContractorID);
+        }
+        //Check to see if the Contractor array is empty or has atleast one value
+        else if (arrayContractor[0] != null){
+            for (int i=0; i<arrayContractor.length; i++){
+                //Check to see if current i location in Contractor Array is empty
+                if (arrayContractor[i] != null){
+                    if (checkForSameContractorID()){
+                        //if same id, display
+                        popUpAlert("Contractor ID unique", "Please use a different Contractor ID", tfContractorID);
+                        break;
+                    }
+                    else if (checkForSameContractorName()){
+                        //if same exact name, display
+                        popUpAlert("Contractor Name must be unique", "Contractor Name already exists:\n"
+                            + "Please enter a drifferent Contractor Name", tfCFirstName);
+                        break;
+                    }
+                    else{
+                        assignContractorValues();
+                        tfContractorID.requestFocus();
+                    }
+                    break;
+                }
+            }
+        }
+        else{
+            assignContractorValues();
+            tfContractorID.requestFocus();
+        }
+    }
+    
+    public void assignContractorValues(){
+        //Start at first free location in Contractor Array
+        for (int i=0; i<arrayContractor.length; i++){
+            if (arrayContractor[i] == null){
+                arrayContractor[i] = new Contractor();
+            }
+            arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
+            arrayContractor[i].setFirstName(tfCFirstName.getText());
+            arrayContractor[i].setMiddleInitial(tfCMI.getText());
+            arrayContractor[i].setLastName(tfCLastName.getText());
+            arrayContractor[i].setFee(tfCFee.getText());
+            arrayContractor[i].setHouseNumber(tfCHouseNumber.getText());
+            arrayContractor[i].setStreet(tfCStreet.getText());
+            arrayContractor[i].setCityCounty(tfCCityCounty.getText());
+            arrayContractor[i].setStateAbb(cbCHomeState);
+            arrayContractor[i].setZipCode(tfCZipCode.getText());
+            arrayContractor[i].setCountryAbb(cbCCountry);
+            arrayContractor[i].setLastUpdatedBy(tfCUpdatedBy.getText());
+            arrayContractor[i].setLastUpdated(getCurrentDate());
+            break;
+        }
+    }                      //looks good 8/7/17 11AM
+    
+    
+    
+    
+    
+    
     public void displayTotalFees(){
         //Declare string and set to null
         String totalFees = null;
@@ -384,28 +595,6 @@ public class Lab1 extends Application{
         }
     }
     
-    public void assignContractorValues(){
-        //Start at first free location in Contractor Array
-        for (int i=0; i<arrayContractor.length; i++){
-            if (arrayContractor[i] == null){
-                arrayContractor[i] = new Contractor();
-            }
-            arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
-            arrayContractor[i].setFirstName(tfCFirstName.getText());
-            arrayContractor[i].setMiddleInitial(tfCMI.getText());
-            arrayContractor[i].setLastName(tfCLastName.getText());
-            arrayContractor[i].setFee(tfCFee.getText());
-            arrayContractor[i].setHouseNumber(tfCHouseNumber.getText());
-            arrayContractor[i].setStreet(tfCStreet.getText());
-            arrayContractor[i].setCityCounty(tfCCityCounty.getText());
-            arrayContractor[i].setStateAbb(cbCHomeState);
-            arrayContractor[i].setZipCode(tfCZipCode.getText());
-            arrayContractor[i].setCountryAbb(cbCCountry);
-            arrayContractor[i].setLastUpdatedBy(tfCUpdatedBy.getText());
-            arrayContractor[i].setLastUpdated(getCurrentDate());
-            break;
-        }
-    }                      //looks good 8/7/17 11AM
     
     public void assignDriverValues(){
         myDriver.setDriverID(Integer.parseInt(tfDriverID.getText()));
@@ -1094,48 +1283,6 @@ public class Lab1 extends Application{
         myDriver.reset();
     }
     
-    public void loadFromDB(String localSqlQuery, String localArray[]){
-        try{
-            int i = 0;
-            sendDBCommand(localSqlQuery);
-            while (dbResults.next()){
-                localArray[i] = dbResults.getString(1);
-                i++;
-            }
-        }catch (SQLException e) {
-            System.out.println(e);
-        }
-    }                //looks good
-    
-    public void loadFromDB(String localSqlQuery, ArrayList<String> localArrayList){
-        try{
-            localArrayList.clear();
-            while (dbResults.next()){
-                String nameConcatenated = null;
-                nameConcatenated = dbResults.getString(1);
-                nameConcatenated += " - " + dbResults.getString(2);
-                if (dbResults.getString(4) != null)
-                    nameConcatenated += " " + dbResults.getString(4);
-                nameConcatenated += " " + dbResults.getString(3);
-                localArrayList.add(nameConcatenated);
-            }
-        }catch (SQLException e) {
-            System.out.println(e);
-        }
-    }   //looks good
-
-    public void loadStatesDataFromDB(){
-        //Populate states into dropdowns
-        Lab1.this.loadFromDB("SELECT STATEABB FROM JAVAUSER.HOMESTATE", stateList);
-        olStateList = FXCollections.observableArrayList(stateList);
-    }                                               //looks good
-    
-    public void loadCountriesDataFromDB(){
-        //populate countries into dropdowns
-        Lab1.this.loadFromDB("SELECT COUNTRYABB FROM JAVAUSER.COUNTRY", countryList);
-        olCountryList = FXCollections.observableArrayList(countryList);
-    }                                           //looks good
-    
     public void loadContractorIDFromDB(){
         //populate contractors into contractor dropdown
         loadFromDB("SELECT CONTRACTORID, FIRSTNAME, LASTNAME, "
@@ -1150,142 +1297,6 @@ public class Lab1 extends Application{
         olDriverID = FXCollections.observableArrayList(equipmentDriverList);
     }                                               //looks good
     
-    public void insertButtonContractor(){
-        //Check to see if ContractorID Field Empty
-        if ("".equals(tfContractorID.getText())){
-            popUpAlert("Contractor ID can't be empty", "Please enter a Contractor ID", tfContractorID);
-        }
-        //Check to see if ContractorID fits into an integer constraint
-        else if (tfContractorID.getText().length() > 10){
-            popUpAlert("Contractor ID Too Long", "Only 10 characters allowed for a Contractor ID", tfContractorID);
-        }
-        //Check to see if ContractorID is a number; acknowledge the max integer constraint
-        else if (isInteger(tfContractorID.getText()) == false){
-            popUpAlert("Contractor ID must be an integer", "Please enter an number for Contractor ID\n"
-                    + "\n"
-                    + "Contractor ID must be less than 2,147,483,648", tfContractorID);
-        }
-        //Check to see if ContractorID is a positive number
-        else if (Integer.parseInt(tfContractorID.getText()) < 0){
-            popUpAlert("Contractor ID Negative", "Contractor ID must be a positive number", tfContractorID);
-        }
-        //Check to see if FirstName is left blank
-        else if("".equals(tfCFirstName.getText())){
-            popUpAlert("No First Name Specified", "First Name can't be left blank", tfCFirstName);
-        }
-        //Check to see if FirstName length is less than 20
-        else if (tfCFirstName.getText().length() > 20){
-            popUpAlert("First Name Too Long", "Only 20 characters allowed for a First Name", tfCFirstName);
-        }
-        //Check to see if MI is only 1 character
-        else if (tfCMI.getText().length() > 1){
-            popUpAlert("Middle Initial Too Long", "Only 1 character allowed for a Middle Initial", tfCMI);
-        }
-        //Check to see if LastName is left blank
-        else if("".equals(tfCLastName.getText())){
-            popUpAlert("No Last Name Specified", "Last Name can't be left blank", tfCLastName);
-        }
-        //Check to see if LastName is less than 20
-        else if (tfCLastName.getText().length() > 20){
-            popUpAlert("Last Name Too Long", "Only 20 characters allowed for a Last Name", tfCLastName);
-        }
-        //Check to see if Fee is a double IF the field is not empty
-        else if(isDouble(tfCFee.getText()) == false && !"".equals(tfCFee.getText())){
-            popUpAlert("Fee must be a double", "Please enter a numeric amount for Fee", tfCFee);
-        }
-        //Check to see if Fee is a positive number
-        else if(isDouble(tfCFee.getText()) == true && !"".equals(tfCFee.getText()) &&
-                Double.parseDouble(tfCFee.getText()) < 0){
-            popUpAlert("Fee must be a positive value", "Please enter a positive value for Fee", tfCFee);
-        }
-        //Check to see if Fee field contains a decimal point AND IF SO
-        //...check to make sure it only contains 2 decimal places or less
-        else if (tfCFee.getText().contains(".") == true && tfCFee.getText().substring(tfCFee.getText().indexOf("."),
-                    tfCFee.getText().length()).length() > 3){
-            popUpAlert("Fee has too many decimal places", "Please reduce amount of decimal places for the Fee", tfCFee);
-        }
-        //Check to see if Fee falls within Decimal (8,2) constraints
-        else if (tfCFee.getText().contains(".") == true && tfCFee.getText().substring(1,
-                    tfCFee.getText().indexOf(".")).length() > 6){
-            popUpAlert("Fee Too Long", "Fee must be less than $1,000,000.00", tfCFee);
-        }
-        //Check to see if Fee is less than $1,000,000.00
-        else if (tfCFee.getText().contains(".") == false &&
-                    tfCFee.getText().length() > 6){
-            popUpAlert("Fee Too Long", "Fee must be less than $1,000,000.00", tfCFee);
-        }
-        //Check to see if House Number fits into an integer constraint
-        else if (tfCHouseNumber.getText().length() > 10){
-            popUpAlert("House Number Too Long", "Only 10 characters allowed for a House Number", tfCHouseNumber);
-        }
-        //Check to see if House number is a number; acknowledge the max integer constraint
-        else if(isInteger(tfCHouseNumber.getText()) == false && !"".equals(tfCHouseNumber.getText())){
-            popUpAlert("House Number must be an integer", "Please enter a number for House Number\n"
-                    + "\n"
-                    + "House Number must be less than 2,147,483,648", tfCHouseNumber);
-        }
-        //Check to see if Street is less than 50 characters
-        else if (tfCStreet.getText().length() > 50){
-            popUpAlert("Street Too Long", "Only 50 characters allowed for a Street", tfCStreet);
-        }
-        //Check to see if City or County is less than 40 characters
-        else if (tfCCityCounty.getText().length() > 40){
-            popUpAlert("City / County Too Long", "Only 40 characters allowed for a City or County", tfCCityCounty);
-        }
-        //Check to see if ZipCode is greater than 5 characters
-        else if (tfCZipCode.getText().length() > 5){
-            popUpAlert("Zip Code Too Long", "Only 5 characters allowed for a Zip Code", tfCZipCode);
-        }
-        //Check to see if ZipCode is less than 5 characters
-        else if (!"".equals(tfCZipCode.getText()) && tfCZipCode.getText().length() < 5){
-            popUpAlert("Zip Code Too Short", "Zip Code must have 5 characters", tfCZipCode);
-        }
-        //Check to see if ZipCode is a number IF the field is not empty
-        else if(isInteger(tfCZipCode.getText()) == false && !"".equals(tfCZipCode.getText())){
-            popUpAlert("Zip Code must be an integer", "Please enter a number for Zip Code", tfCZipCode);
-        }
-        //Check to see if UpdatedBy is null
-        else if("".equals(tfCUpdatedBy.getText())){
-            popUpAlert("No Ownership to Update Specified", "Please write your name in the \"Updated By\" box", tfCUpdatedBy);
-        }
-        //Check to see if UpdatedBy is less than 20 characters
-        else if (tfCUpdatedBy.getText().length()> 20){
-            popUpAlert("Updated By Too Long", "Only 20 characters allowed for an Updated By Ownership", tfCUpdatedBy);
-        }
-        //Check to see if Contractor array last location is empty
-        else if (arrayContractor[FIXED_ARRAY_SIZE-1] != null){
-            popUpAlert("Contractor Array is Full!", "You must commit the Contractor Array \n"
-                    + "before adding a new Contractor!", tfContractorID);
-        }
-        //Check to see if the Contractor array is empty or has atleast one value
-        else if (arrayContractor[0] != null){
-            for (int i=0; i<arrayContractor.length; i++){
-                //Check to see if current i location in Contractor Array is empty
-                if (arrayContractor[i] != null){
-                    if (checkForSameContractorID()){
-                        //if same id, display
-                        popUpAlert("Contractor ID unique", "Please use a different Contractor ID", tfContractorID);
-                        break;
-                    }
-                    else if (checkForSameContractorName()){
-                        //if same exact name, display
-                        popUpAlert("Contractor Name must be unique", "Contractor Name already exists:\n"
-                            + "Please enter a drifferent Contractor Name", tfCFirstName);
-                        break;
-                    }
-                    else{
-                        assignContractorValues();
-                        tfContractorID.requestFocus();
-                    }
-                    break;
-                }
-            }
-        }
-        else{
-            assignContractorValues();
-            tfContractorID.requestFocus();
-        }
-    }
     
     public void popUpAlert(String title, String message, TextField focusRequest){
         alert.setHeaderText(title);
@@ -1810,7 +1821,5 @@ public class Lab1 extends Application{
         return gridPane;
     }
     
-    public static void main(String[] args) {
-        Application.launch(args);   
-    }
+    
 }
