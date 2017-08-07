@@ -10,21 +10,23 @@ this academic work
 public class Contractor 
     extends Person {
     int ContractorID;
-    double Fee;
+    double fee;
 
     //Constructor
     public Contractor() {
         //Data Fields
         ContractorID = 0;
-        Fee = 0;
+        fee = 0;
     }
     
     //Setter Methods
-    public void setContractorID(int i){
-        this.ContractorID = i;
+    public void setContractorID(int contractorIDPassed){
+        this.ContractorID = contractorIDPassed;
     }
-    public void setFee(Double d){
-        this.Fee = d;
+    public void setFee(String feePassed){
+        if (feePassed.equals(""))
+            this.fee = 0;                                       //assign 0 if textbox empty
+        else this.fee = Integer.parseInt(feePassed);            //assign int
     }
     
     //Getter Methods
@@ -32,6 +34,6 @@ public class Contractor
         return this.ContractorID;
     }
     public Double getFee(){ 
-        return this.Fee;
+        return this.fee;
     }
 }

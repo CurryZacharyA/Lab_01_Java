@@ -35,10 +35,10 @@ public class Person {
     //Create Overload methods....?
     
     //Setter Methods
-    public void setFirstName(String firstNamePassed){       //Required
+    public void setFirstName(String firstNamePassed){                   //Required - First Name
         this.FirstName = firstNamePassed;
     }
-    public void setLastName(String lastNamePassed){         //Required
+    public void setLastName(String lastNamePassed){                     //Required - Last Name
         this.LastName = lastNamePassed;
     }
     public void setMiddleInitial(String middleInitialPassed){
@@ -46,29 +46,49 @@ public class Person {
             this.MiddleInitial = "NULL";
         else this.MiddleInitial = middleInitialPassed;
     }
-    public void setHouseNumber(int houseNumberPassed){
-        this.HouseNumber = houseNumberPassed;
+    public void setHouseNumber (String houseNumberPassed){
+        if (houseNumberPassed.equals(""))
+            this.HouseNumber = 0;                                       //assign 0 if textbox empty
+        else this.HouseNumber = Integer.parseInt(houseNumberPassed);    //assign int
     }
     public void setStreet(String streetPassed){
-        this.Street = streetPassed;
+        if (streetPassed.equals(""))
+            this.Street = "NULL";
+        else this.Street = streetPassed;
     }
     public void setCityCounty(String cityCountyPassed){
-        this.CityCounty = cityCountyPassed;
+        if (cityCountyPassed.equals(""))
+            this.CityCounty = "NULL";
+        else this.CityCounty = cityCountyPassed;
     }
-    public void setStateAbb(String stateAbbPassed){
-        this.StateAbb = stateAbbPassed;
+    public void setStateAbb(Object stateAbbPassed){
+        try{
+            this.StateAbb = stateAbbPassed.toString();                  //assign abbrevation to person
+        }catch (NullPointerException npe){
+            this.StateAbb = "NULL";                                     //assign NULL if empty
+        }
     }
-    public void setCountryAbb(String countryAbbPassed){
-        this.CountryAbb = countryAbbPassed;
+    public void setCountryAbb(Object countryAbbPassed){
+        try{
+            this.CountryAbb = countryAbbPassed.toString();              //assign abbrevation to person
+        }catch (NullPointerException npe){
+            this.CountryAbb = "NULL";                                   //assign NULL if empty
+        }
     }
     public void setZipCode(String zipCodePassed){
-        this.ZipCode = zipCodePassed;
+        if (zipCodePassed.equals(""))
+            this.ZipCode = "NULL";
+        else this.ZipCode = zipCodePassed;
     }
     public void setLastUpdatedBy(String lastUpdatedByPassed){
-        this.LastUpdatedBy = lastUpdatedByPassed;
+        if (lastUpdatedByPassed.equals(""))
+            this.LastUpdatedBy = "NULL";
+        else this.LastUpdatedBy = lastUpdatedByPassed;
     }
     public void setLastUpdated(String lastUpdatedPassed){
-        this.LastUpdated = lastUpdatedPassed;
+        if (lastUpdatedPassed.equals(""))
+            this.LastUpdated = "NULL";
+        else this.LastUpdated = lastUpdatedPassed;
     }
     
     //Getter Methods

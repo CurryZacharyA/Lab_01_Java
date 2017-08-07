@@ -703,7 +703,7 @@ public class Lab1 extends Application{
         if ("NULL".equals(arrayContractor[i].getMiddleInitial()))
             sqlQuery += arrayContractor[i].getMiddleInitial()+ ", ";
         else sqlQuery += "'" + arrayContractor[i].getMiddleInitial() + "', ";
-        if (arrayContractor[i].HouseNumber == 0)
+        if (arrayContractor[i].getHouseNumber() == 0)
             sqlQuery += "NULL, ";
         else sqlQuery += "'" + arrayContractor[i].getHouseNumber().toString() + "', ";
         if ("NULL".equals(arrayContractor[i].getStreet()))
@@ -721,7 +721,7 @@ public class Lab1 extends Application{
         if ("NULL".equals(arrayContractor[i].getZipCode()))
             sqlQuery += arrayContractor[i].getZipCode() + ", ";
         else sqlQuery += "'" + arrayContractor[i].getZipCode() + "', ";
-        if (arrayContractor[i].Fee == 0)
+        if (arrayContractor[i].getFee() == 0)
             sqlQuery += "NULL, ";
         else sqlQuery += "'" + arrayContractor[i].getFee().toString() + "', ";
         sqlQuery += "'" + arrayContractor[i].getLastUpdatedBy() + "', ";
@@ -1184,7 +1184,8 @@ public class Lab1 extends Application{
         }
         return false;
     }
-    public void assignContractorPersonValues(){
+    public void assignContractorValues(){
+        //Start at first free location in Contractor Array
         for (int i=0; i<arrayContractor.length; i++){
             if (arrayContractor[i] == null){
                 arrayContractor[i] = new Contractor();
@@ -1192,92 +1193,17 @@ public class Lab1 extends Application{
             arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
             arrayContractor[i].setFirstName(tfCFirstName.getText());
             arrayContractor[i].setMiddleInitial(tfCMI.getText());
-            
-            
-            
-            
-        }
-    }
-    
-    
-    public void assignContractorValues(){
-        //Start at first free location in Contractor Array
-        for (int i=0; i<arrayContractor.length; i++){
-            try{
-                //Check to see if location is free, if not move to next location in array
-                if (arrayContractor[i] == null){
-                    //Create Contractor object in Contractor Array
-                    //arrayContractor[i] = new Contractor();
-                //arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
-                //Assign FirstName TextField to Contractor Array
-                //arrayContractor[i].setFirstName(tfCFirstName.getText());
-                //Assign MiddleInitial TextField to Contractor Array
-                //if ("".equals(tfCMI.getText()))
-                  //  arrayContractor[i].setMiddleInitial("NULL");
-                //else arrayContractor[i].setMiddleInitial(tfCMI.getText());
-                
-                
-                /*
-                
-                
-                
-                
-                
-                LEFT OFF HERE
-                
-                
-                
-                
-                */
-                
-                
-                
-                
-                
-                
-                //Assign LastName TextField to Contractor Array
-                arrayContractor[i].setLastName(tfCLastName.getText());                    
-                //Assign HouseNumber TextField to Contractor Array
-                if ("".equals(tfCHouseNumber.getText()))
-                    arrayContractor[i].HouseNumber = 0;
-                else arrayContractor[i].setHouseNumber(Integer.parseInt(tfCHouseNumber.getText()));
-                //Assign Street TextField to Contractor Array
-                if ("".equals(tfCStreet.getText()))
-                    arrayContractor[i].setStreet("NULL");
-                else arrayContractor[i].setStreet(tfCStreet.getText());
-                //Assign CityCounty TextField to Contractor Array
-                if ("".equals(tfCCityCounty.getText()))
-                    arrayContractor[i].setCityCounty("NULL");
-                else arrayContractor[i].setCityCounty(tfCCityCounty.getText());
-                //Assign StateDropDown to Contractor Array
-                try{
-                    arrayContractor[i].setStateAbb(cbCHomeState.getValue().toString());
-                }catch (NullPointerException npe){
-                    arrayContractor[i].StateAbb = "NULL";
-                }
-                //Assign ZipCode TextField to Contractor Array
-                if ("".equals(tfCZipCode.getText()))
-                    arrayContractor[i].setZipCode("NULL");
-                else arrayContractor[i].setZipCode(tfCZipCode.getText());
-                //Assign CountryDropDown to Contractor Array
-                try{
-                    arrayContractor[i].setCountryAbb(cbCCountry.getValue().toString());
-                }catch (NullPointerException npe){
-                    arrayContractor[i].setCountryAbb("NULL");
-                }
-                //Assign Fee TextField to Contractor Array
-                if ("".equals(tfCFee.getText()))
-                    arrayContractor[i].Fee = 0;
-                else arrayContractor[i].setFee(Double.parseDouble(tfCFee.getText()));
-                //Assign UpdatedBy TextField to Contractor Array
-                if ("".equals(tfCUpdatedBy.getText()))
-                    arrayContractor[i].setLastUpdatedBy("NULL");
-                else arrayContractor[i].setLastUpdatedBy(tfCUpdatedBy.getText());
-                arrayContractor[i].setLastUpdated(getCurrentTimeStamp());
-                //Exit if loop when empty array qualifications are met
-                break;
-                }
-            }catch (NumberFormatException e) {}
+            arrayContractor[i].setLastName(tfCLastName.getText());
+            arrayContractor[i].setHouseNumber(tfCHouseNumber.getText());
+            arrayContractor[i].setStreet(tfCStreet.getText());
+            arrayContractor[i].setCityCounty(tfCCityCounty.getText());
+            arrayContractor[i].setStateAbb(cbCHomeState);
+            arrayContractor[i].setZipCode(tfCZipCode.getText());
+            arrayContractor[i].setCountryAbb(cbCCountry);
+            arrayContractor[i].setFee(tfCFee.getText());
+            arrayContractor[i].setLastUpdatedBy(tfCUpdatedBy.getText());
+            arrayContractor[i].setLastUpdated(getCurrentTimeStamp());
+            break;
         }
     }
     
