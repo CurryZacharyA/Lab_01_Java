@@ -9,19 +9,20 @@ this academic work
 
 public class Contractor 
     extends Person {
-    int ContractorID;
+    private int contractorID;
+    private static int contractorIDCount;
     double fee;
 
     //Constructor
     public Contractor() {
         //Data Fields
-        ContractorID = 0;
+        contractorID = ++contractorIDCount;
         fee = 0;
     }
     
     //Setter Methods
-    public void setContractorID(int contractorIDPassed){
-        this.ContractorID = contractorIDPassed;
+    public void setContractorID(int contractorIDPassed){        //Required - ContractorID
+        this.contractorID = contractorIDPassed;
     }
     public void setFee(String feePassed){
         if (feePassed.equals(""))
@@ -31,7 +32,7 @@ public class Contractor
     
     //Getter Methods
     public Integer getContratorID(){
-        return this.ContractorID;
+        return this.contractorID;
     }
     public Double getFee(){ 
         return this.fee;

@@ -693,6 +693,8 @@ public class Lab1 extends Application{
         return gridPane;
     }
     
+    
+    //NEED TO WORK ON THIS!!!
     public void insertContractorValuesIntoDB(int i){
         //Set up Contractor Array Values into SQL language
         //in order to insert into the Contractor Table in the Database
@@ -731,6 +733,7 @@ public class Lab1 extends Application{
         arrayContractor[i] = null;
     }
     
+    //NEED TO WORK ON THIS!!!
     public void insertDriverValuesIntoDB(){
         //Format a SQL Statement to insert Driver Values
         sqlQuery = "INSERT INTO JAVAUSER.DRIVER VALUES(";
@@ -831,20 +834,7 @@ public class Lab1 extends Application{
         }
     }
     
-    public void loadStatesDataFromDB(){
-        //Populate states into dropdowns
-        loadFromDB("SELECT STATEABB FROM JAVAUSER.HOMESTATE", stateList);
-        olStateList = FXCollections.observableArrayList(stateList);
-    }
-    
-    public void loadCountriesDataFromDB(){
-        //populate countries into dropdowns
-        loadFromDB("SELECT COUNTRYABB FROM JAVAUSER.COUNTRY", countryList);
-        olCountryList = FXCollections.observableArrayList(countryList);
-    }
-    
-    public void loadPersonFromDB(String localSqlQuery, ArrayList<String>
-            localArrayList){
+    public void loadFromDB(String localSqlQuery, ArrayList<String> localArrayList){
         try{
             localArrayList.clear();
             while (dbResults.next()){
@@ -858,17 +848,29 @@ public class Lab1 extends Application{
             }
         }catch (SQLException e) {}
     }
+
+    public void loadStatesDataFromDB(){
+        //Populate states into dropdowns
+        Lab1.this.loadFromDB("SELECT STATEABB FROM JAVAUSER.HOMESTATE", stateList);
+        olStateList = FXCollections.observableArrayList(stateList);
+    }
+    
+    public void loadCountriesDataFromDB(){
+        //populate countries into dropdowns
+        Lab1.this.loadFromDB("SELECT COUNTRYABB FROM JAVAUSER.COUNTRY", countryList);
+        olCountryList = FXCollections.observableArrayList(countryList);
+    }
     
     public void loadContractorIDFromDB(){
         //populate contractors into contractor dropdown
-        loadPersonFromDB("SELECT CONTRACTORID, FIRSTNAME, LASTNAME, "
+        loadFromDB("SELECT CONTRACTORID, FIRSTNAME, LASTNAME, "
                 + "MIDDLEINITIAL FROM CONTRACTOR", driverContractorList);
         olContractorID = FXCollections.observableArrayList(driverContractorList);
     }
     
     public void loadDriverIDFromDB(){
         //populate drivers on driver dropdown
-        loadPersonFromDB("SELECT DRIVERID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
+        loadFromDB("SELECT DRIVERID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
                 + "FROM DRIVER", equipmentDriverList);
         olDriverID = FXCollections.observableArrayList(equipmentDriverList);
     }
@@ -1184,6 +1186,7 @@ public class Lab1 extends Application{
         }
         return false;
     }
+    
     public void assignContractorValues(){
         //Start at first free location in Contractor Array
         for (int i=0; i<arrayContractor.length; i++){
@@ -1194,18 +1197,18 @@ public class Lab1 extends Application{
             arrayContractor[i].setFirstName(tfCFirstName.getText());
             arrayContractor[i].setMiddleInitial(tfCMI.getText());
             arrayContractor[i].setLastName(tfCLastName.getText());
+            arrayContractor[i].setFee(tfCFee.getText());
             arrayContractor[i].setHouseNumber(tfCHouseNumber.getText());
             arrayContractor[i].setStreet(tfCStreet.getText());
             arrayContractor[i].setCityCounty(tfCCityCounty.getText());
             arrayContractor[i].setStateAbb(cbCHomeState);
             arrayContractor[i].setZipCode(tfCZipCode.getText());
             arrayContractor[i].setCountryAbb(cbCCountry);
-            arrayContractor[i].setFee(tfCFee.getText());
             arrayContractor[i].setLastUpdatedBy(tfCUpdatedBy.getText());
             arrayContractor[i].setLastUpdated(getCurrentDate());
             break;
         }
-    }
+    }                       //looks good 8/7/17 11AM
     
     public boolean checkDateOfBirth(){
         //Date of Birth validations
@@ -1897,77 +1900,24 @@ public class Lab1 extends Application{
     }
     
     public void assignDriverValues(){
-        //Assign DriverID to myDriver
         myDriver.setDriverID(Integer.parseInt(tfDriverID.getText()));
-        //Assign FirstName to myDriver
         myDriver.setFirstName(tfDFirstName.getText());
-        //Assign MiddleInitial to myDriver
-        if ("".equals(tfDMI.getText()))
-            myDriver.setMiddleInitial("NULL");
-        else myDriver.setMiddleInitial(tfDMI.getText());
-        //Assign LastName to myDriver
+        myDriver.setMiddleInitial(tfDMI.getText());
         myDriver.setLastName(tfDLastName.getText());
-        //Assign Salary to myDriver
-        if ("".equals(tfDSalary.getText()))
-            myDriver.Salary = null;
-        else myDriver.setSalary(Double.parseDouble(tfDSalary.getText()));
-        //Assign DateOfBirth to myDriver
-        if ("".equals(tfDDateOfBirth.getText()))
-            myDriver.setDateOfBirth("NULL");
-        else myDriver.setDateOfBirth(tfDDateOfBirth.getText());
-        //Assign CDL ID to myDriver
-        if ("".equals(tfDCDL.getText()))
-            myDriver.setCDL("NULL");
-        else myDriver.setCDL(tfDCDL.getText());
-        //Assign CDL Experation Date to myDriver
-        if ("".equals(tfDCDLDate.getText()))
-            myDriver.setCDLDate("NULL");
-        else myDriver.setCDLDate(tfDCDLDate.getText());
-        //Assign ContractorID to myDriver
-        myDriver.setContractorID(Integer.parseInt(
-            cbDContractorID.getValue().toString().substring(0,
-            cbDContractorID.getValue().toString().indexOf(" "))));
-        //Assign HouseNumber to myDriver
-        if ("".equals(tfDHouseNumber.getText()))
-            myDriver.HouseNumber = null;
-        else myDriver.setHouseNumber(Integer.parseInt(tfDHouseNumber.getText()));
-        //Assign Street to myDriver
-        if ("".equals(tfDStreet.getText()))
-            myDriver.setStreet("NULL");
-        else myDriver.setStreet(tfDStreet.getText());
-        //Assing CityCountry to myDriver
-        if ("".equals(tfDCityCounty.getText()))
-            myDriver.setCityCounty("NULL");
-        else myDriver.setCityCounty(tfDCityCounty.getText());
-        //Assign StateDropDown to myDriver
-        try{
-            myDriver.setStateAbb(cbDHomeState.getValue().toString());
-        }catch (NullPointerException npe){
-            myDriver.StateAbb = "NULL";
-        }
-        //Assign ZipCode to myDriver
-        if ("".equals(tfDZipCode.getText()))
-            myDriver.setZipCode("NULL");
-        else myDriver.setZipCode(tfDZipCode.getText());
-        //assign CountryDropDown to myDriver
-        try{
-            myDriver.setCountryAbb(cbDCountry.getValue().toString());
-        }catch (NullPointerException npe){
-            myDriver.CountryAbb = "NULL";
-        }
-        //Assign HireDate to myDriver
-        if ("".equals(tfDHireDate.getText()))
-            myDriver.setHireDate("NULL");
-        else myDriver.setHireDate(tfDHireDate.getText());
-        //Assign TerminationDate to myDriver
-        if ("".equals(tfDTerminationDate.getText()))
-            myDriver.setTerminationDate("NULL");
-        else myDriver.setTerminationDate(tfDTerminationDate.getText());
-        //Assign UpdatedBy to myDriver
-        if ("".equals(tfDUpdatedBy.getText()))
-            myDriver.setLastUpdatedBy("NULL");
-        else myDriver.setLastUpdatedBy(tfDUpdatedBy.getText());
-        //Assign LastUpdated to myDriver
+        myDriver.setSalary(tfDSalary.getText());
+        myDriver.setDateOfBirth(tfDDateOfBirth.getText());
+        myDriver.setCDL(tfDCDL.getText());
+        myDriver.setCDLDate(tfDCDLDate.getText());
+        myDriver.setContractorID(cbDContractorID);
+        myDriver.setHouseNumber(tfDHouseNumber.getText());
+        myDriver.setStreet(tfDStreet.getText());
+        myDriver.setCityCounty(tfDCityCounty.getText());
+        myDriver.setStateAbb(cbDHomeState);
+        myDriver.setZipCode(tfDZipCode.getText());
+        myDriver.setCountryAbb(cbDCountry);
+        myDriver.setHireDate(tfDHireDate.getText());
+        myDriver.setTerminationDate(tfDTerminationDate.getText());
+        myDriver.setLastUpdatedBy(tfDUpdatedBy.getText());
         myDriver.setLastUpdated(getCurrentDate());
     }
     
@@ -2314,5 +2264,4 @@ public class Lab1 extends Application{
     public static void main(String[] args) {
         Application.launch(args);   
     }
-    
 }

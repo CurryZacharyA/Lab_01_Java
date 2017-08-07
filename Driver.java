@@ -28,23 +28,31 @@ public class Driver
     }
     
     //Setter Methods
-    public void setDriverID(int driverIDPassed){
+    public void setDriverID(int driverIDPassed){                        //Required - DriverID
         this.driverID = driverIDPassed;
     }
-    public void setContractorID(int contractorIDPassed){
-        this.contractorID = contractorIDPassed;
+    public void setContractorID(Object contractorIDPassed){             //Required - ContractorID
+        this.contractorID = Integer.parseInt(contractorIDPassed.toString());
     }
-    public void setSalary(Double salaryPassed){
-        this.salary = salaryPassed;
+    public void setSalary(String salaryPassed){
+        if (salaryPassed.equals(""))
+            this.salary = 0;                                            //assign 0 if textbox empty
+        else this.salary = Integer.parseInt(salaryPassed);              //assign int
     }
     public void setDateOfBirth(String dateOfBirthPassed){
-        this.dateOfBirth = dateOfBirthPassed;
+        if (dateOfBirthPassed.equals(""))
+            this.dateOfBirth = "NULL";
+        else this.dateOfBirth = dateOfBirthPassed;
     }
     public void setCDL(String driverCDLPassed){
-        this.driverCDL = driverCDLPassed;
+        if (driverCDLPassed.equals(""))
+            this.driverCDL = "NULL";
+        else this.driverCDL = driverCDLPassed;
     }
     public void setCDLDate(String driverCDLDatePassed){
-        this.driverCDLDate = driverCDLDatePassed;
+        if (driverCDLDatePassed.equals(""))
+            this.driverCDLDate = "NULL";
+        else this.driverCDLDate = driverCDLDatePassed;
     }
     public void setHireDate(String hireDatePassed){
         this.hireDate = hireDatePassed;
