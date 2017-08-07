@@ -38,7 +38,7 @@ public class Person {
     }
     public void setMiddleInitial(String middleInitialPassed){
         if (middleInitialPassed.equals(""))
-            this.middleInitial = "NULL";
+            this.middleInitial = "'NULL'";
         else this.middleInitial = middleInitialPassed;
     }
     public void setHouseNumber (String houseNumberPassed){
@@ -48,41 +48,41 @@ public class Person {
     }
     public void setStreet(String streetPassed){
         if (streetPassed.equals(""))
-            this.street = "NULL";
+            this.street = "'NULL'";
         else this.street = streetPassed;
     }
     public void setCityCounty(String cityCountyPassed){
         if (cityCountyPassed.equals(""))
-            this.cityCounty = "NULL";
+            this.cityCounty = "'NULL'";
         else this.cityCounty = cityCountyPassed;
     }
     public void setStateAbb(Object stateAbbPassed){
         try{
             this.stateAbb = stateAbbPassed.toString();                  //assign abbrevation to person
         }catch (NullPointerException npe){
-            this.stateAbb = "NULL";                                     //assign NULL if empty
+            this.stateAbb = "'NULL'";                                     //assign 'NULL' if empty
         }
     }
     public void setCountryAbb(Object countryAbbPassed){
         try{
             this.countryAbb = countryAbbPassed.toString();              //assign abbrevation to person
         }catch (NullPointerException npe){
-            this.countryAbb = "NULL";                                   //assign NULL if empty
+            this.countryAbb = "'NULL'";                                   //assign 'NULL' if empty
         }
     }
     public void setZipCode(String zipCodePassed){
         if (zipCodePassed.equals(""))
-            this.zipCode = "NULL";
+            this.zipCode = "'NULL'";
         else this.zipCode = zipCodePassed;
     }
     public void setLastUpdatedBy(String lastUpdatedByPassed){
         if (lastUpdatedByPassed.equals(""))
-            this.lastUpdatedBy = "NULL";
+            this.lastUpdatedBy = "'NULL'";
         else this.lastUpdatedBy = lastUpdatedByPassed;
     }
     public void setLastUpdated(String lastUpdatedPassed){
         if (lastUpdatedPassed.equals(""))
-            this.lastUpdated = "NULL";
+            this.lastUpdated = "'NULL'";
         else this.lastUpdated = lastUpdatedPassed;
     }
     

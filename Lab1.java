@@ -340,15 +340,15 @@ public class Lab1 extends Application{
         }catch (SQLException e) {}
     }
     
+    //FIND BETTER WAY
     public void displayDriverEquipment(){
         //select data to show Equipment for each driver
-        sqlQuery = "SELECT DRIVER.DRIVERID, FIRSTNAME, MIDDLEINITIAL, LASTNAME,\n"
+        sendDBCommand("SELECT DRIVER.DRIVERID, FIRSTNAME, MIDDLEINITIAL, LASTNAME,\n"
                 + "ID, VINNUMBER, MAKE, MODEL, EQUIPMENTYEAR, PRICEACQUIRED, LICENSENUMBER\n"
                 + "FROM DRIVER\n"
                 + "LEFT OUTER JOIN EQUIPMENT\n"
                 + "ON DRIVER.DRIVERID = EQUIPMENT.DRIVERID\n"
-                + "ORDER BY DRIVER.DRIVERID";
-        sendDBCommand(sqlQuery);
+                + "ORDER BY DRIVER.DRIVERID");
         //set default result if database returns null
         String displayDE = "No Drivers or Equipment in the database";
         try{
@@ -386,314 +386,6 @@ public class Lab1 extends Application{
             //display string predetermined
             taDisplayData.setText(displayDE);
         }catch (SQLException e) {}
-    }
-    
-    public HBox addTopHBox(){
-        HBox hbTopPane = new HBox();
-        hbTopPane.setPadding(new Insets(5, 12, 5, 12));
-        hbTopPane.setSpacing(10);
-        hbTopPane.setStyle("-fx-background-color: #0E3E6C;");
-        
-        //Add directions to the program
-        String Directions = "Created by Zachary Curry\n"
-                + "1. Please add Contractor before adding either a "
-                + "Driver or any Equipment \n"
-                + "2. Please add Driver before adding a piece of Equipment\n"
-                + "3. Dates should be entered as a \"DD/MM/YYYY\" format\n"
-                + "4. Please enter dollar amounts without the \"$\" in \"Fee\", \"Salary\", and \"Price Acquired\"\n"
-                + "5. Write your name in the Updated By box at the bottom right before Committing information\n"
-                + "6. Insert adds a Contractor to the array, max Contractors allowed at one time is 3\n"
-                + "7. Commit enters the values (from array) into the database (and clears the array)\n"
-                + "8. BOLD Lables indicate where information is required to commit to the database";
-        Text txtDirections = new Text(Directions);
-        txtDirections.setFill(Color.WHITE);
-        
-        hbTopPane.getChildren().add(txtDirections);
-
-        return hbTopPane;
-        }
-    
-    public HBox addBottomHBox(){
-        HBox hbBottomPane = new HBox();
-        hbBottomPane.setPadding(new Insets(15, 12, 15, 12));
-        hbBottomPane.setSpacing(10);
-        hbBottomPane.setStyle("-fx-background-color: #0E3E6C;");
-        
-        taDisplayData.setPrefSize(843, 75);
-        taDisplayData.setEditable(false);
-        
-        //add readonly text area to bottom pane
-        hbBottomPane.getChildren().addAll(taDisplayData);
-        
-        return hbBottomPane;
-        }
-    
-    public GridPane createCGridPane(){
-        GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(20, 20, 20, 20));
-        gridPane.setHgap(7); gridPane.setVgap(7);
-        gridPane.getColumnConstraints().addAll(col1,col2,col3,col4,col5,col6);
-        
-        //Set row constraints
-        for (int i = 0; i < 10; i++) {
-         RowConstraints row = new RowConstraints(25);
-         gridPane.getRowConstraints().add(row);
-            }
-        
-        //Create Contrator Labels
-        Label lblContractor = new Label("Contractor");
-        lblContractor.setFont(Font.font("Courier", 16));
-        Label lblContractorID = new Label("Contractor ID:");
-        lblContractorID.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblCFirstName = new Label("First Name:");
-        lblCFirstName.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblCMI = new Label ("MI:");
-        Label lblCLastName = new Label ("Last Name:");
-        lblCLastName.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblCHouseNumber = new Label ("House Number:");
-        Label lblCStreet = new Label ("Street:");
-        Label lblCCityCounty = new Label ("City or County:");
-        Label lblCState = new Label ("State:");
-        Label lblCZipCode = new Label ("Zip Code:");
-        Label lblCCountry = new Label ("Country:");
-        Label lblCFee = new Label ("Fee: $");
-        Label lblCUpdatedBy = new Label ("Updated By:");
-        lblCUpdatedBy.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-
-        //Position Label Text Right Alignment
-        GridPane.setHalignment(lblContractorID, HPos.RIGHT);
-        GridPane.setHalignment(lblCFirstName, HPos.RIGHT);
-        GridPane.setHalignment(lblCMI, HPos.RIGHT);
-        GridPane.setHalignment(lblCLastName, HPos.RIGHT);
-        GridPane.setHalignment(lblCHouseNumber, HPos.RIGHT);
-        GridPane.setHalignment(lblCStreet, HPos.RIGHT);
-        GridPane.setHalignment(lblCCityCounty, HPos.RIGHT);
-        GridPane.setHalignment(lblCState, HPos.RIGHT);
-        GridPane.setHalignment(lblCZipCode, HPos.RIGHT);
-        GridPane.setHalignment(lblCCountry, HPos.RIGHT);
-        GridPane.setHalignment(lblCFee, HPos.RIGHT);
-        GridPane.setHalignment(lblCUpdatedBy, HPos.RIGHT);
-        
-        //Add Labels to gridPane
-        gridPane.add(lblContractor, 0, 0);
-        gridPane.add(lblContractorID, 0, 1);
-        gridPane.add(lblCFirstName, 0, 2);
-        gridPane.add(lblCMI, 0, 3);
-        gridPane.add(lblCLastName, 0, 4);
-        gridPane.add(lblCFee, 0, 6);
-        gridPane.add(lblCHouseNumber, 2, 2);
-        gridPane.add(lblCStreet, 2, 3);
-        gridPane.add(lblCCityCounty, 2, 4);
-        gridPane.add(lblCState, 2, 5);
-        gridPane.add(lblCZipCode, 2, 6);
-        gridPane.add(lblCCountry, 2, 7);
-        gridPane.add(lblCUpdatedBy, 4, 10);
-        
-        //Add Textfields and DropDowns to gridPane
-        gridPane.add(tfContractorID, 1, 1);
-        gridPane.add(tfCFirstName, 1, 2);
-        gridPane.add(tfCMI, 1, 3);
-        gridPane.add(tfCLastName, 1, 4);
-        gridPane.add(tfCFee, 1, 6);
-        gridPane.add(tfCHouseNumber, 3, 2);
-        gridPane.add(tfCStreet, 3, 3);
-        gridPane.add(tfCCityCounty, 3, 4);
-        gridPane.add(cbCHomeState = new ComboBox(olStateList), 3, 5);
-        gridPane.add(tfCZipCode, 3, 6);
-        gridPane.add(cbCCountry = new ComboBox(olCountryList), 3, 7);
-        gridPane.add(tfCUpdatedBy, 5, 10);
-        
-        //Add Buttons to gridPane
-        btnCInsert.setPrefSize(100, 20);
-        btnCCommit.setPrefSize(100, 20);
-        gridPane.add(btnCInsert, 4, 0);
-        gridPane.add(btnCCommit, 5, 0);
-        
-        return gridPane;
-    }
-    
-    public GridPane createDGridPane(){
-        GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(20, 20, 20, 20));
-        gridPane.setHgap(7); gridPane.setVgap(7);
-        gridPane.getColumnConstraints().addAll(col1,col2,col3,col4,col5,col6);
-        loadContractorIDFromDB();
-        
-        //set row size on pane
-        for (int i = 0; i < 10; i++) {
-            RowConstraints row = new RowConstraints(25);
-            gridPane.getRowConstraints().add(row);
-        }
-        
-        //Create Driver Labels
-        Label lblDriver = new Label("Driver");
-        lblDriver.setFont(Font.font("Arial", 16));
-        Label lblDriverID = new Label("Driver ID:");
-        lblDriverID.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblDFirstName = new Label("First Name:");
-        lblDFirstName.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblDMI = new Label ("MI:");
-        Label lblDLastName = new Label ("Last Name:");
-        lblDLastName.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblDSalary = new Label ("Salary: $");
-        Label lblDContractorID = new Label ("Contractor:");
-        lblDContractorID.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblDHouseNumber = new Label ("House Number:");
-        Label lblDStreet = new Label ("Street:");
-        Label lblDCityCounty = new Label ("City or County:");
-        Label lblDState = new Label ("State:");
-        Label lblDZipCode = new Label ("Zip Code:");
-        Label lblDCountry = new Label ("Country:");
-        Label lblDOB = new Label ("Date of Birth:");
-        lblDOB.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblCDL = new Label ("CDL ID:");
-        Label lblCDLDate = new Label ("CDL Experation Date:");
-        Label lblDHireDate = new Label ("Hire Date:");
-        Label lblDTerminationDate = new Label ("Termination Date:");
-        Label lblDUpdatedBy = new Label ("Updated By:");
-        lblDUpdatedBy.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        
-        //Position Label Text Right Alignment
-        GridPane.setHalignment(lblDriverID, HPos.RIGHT);
-        GridPane.setHalignment(lblDFirstName, HPos.RIGHT);
-        GridPane.setHalignment(lblDMI, HPos.RIGHT);
-        GridPane.setHalignment(lblDLastName, HPos.RIGHT);
-        GridPane.setHalignment(lblDSalary, HPos.RIGHT);
-        GridPane.setHalignment(lblDOB, HPos.RIGHT);
-        GridPane.setHalignment(lblCDL, HPos.RIGHT);
-        GridPane.setHalignment(lblCDLDate, HPos.RIGHT);
-        GridPane.setHalignment(lblDContractorID, HPos.RIGHT);
-        GridPane.setHalignment(lblDHouseNumber, HPos.RIGHT);
-        GridPane.setHalignment(lblDStreet, HPos.RIGHT);
-        GridPane.setHalignment(lblDCityCounty, HPos.RIGHT);
-        GridPane.setHalignment(lblDState, HPos.RIGHT);
-        GridPane.setHalignment(lblDZipCode, HPos.RIGHT);
-        GridPane.setHalignment(lblDCountry, HPos.RIGHT);
-        GridPane.setHalignment(lblDHireDate, HPos.RIGHT);
-        GridPane.setHalignment(lblDTerminationDate, HPos.RIGHT);
-        GridPane.setHalignment(lblDUpdatedBy, HPos.RIGHT);
-
-        //Add Labels to gridPane
-        gridPane.add(lblDriver, 0, 0);
-        gridPane.add(lblDriverID, 0, 1);
-        gridPane.add(lblDFirstName, 0, 2);
-        gridPane.add(lblDMI, 0, 3);
-        gridPane.add(lblDLastName, 0, 4);
-        gridPane.add(lblDSalary, 0, 6);
-        gridPane.add(lblDOB, 0, 7);
-        gridPane.add(lblCDL, 0, 8);
-        gridPane.add(lblCDLDate, 0, 9);
-        gridPane.add(lblDContractorID, 2, 1);
-        gridPane.add(lblDHouseNumber, 2, 2);
-        gridPane.add(lblDStreet, 2, 3);
-        gridPane.add(lblDCityCounty, 2, 4);
-        gridPane.add(lblDState, 2, 5);
-        gridPane.add(lblDZipCode, 2, 6);
-        gridPane.add(lblDCountry, 2, 7);
-        gridPane.add(lblDHireDate, 4, 2);
-        gridPane.add(lblDTerminationDate, 4, 3);
-        gridPane.add(lblDUpdatedBy, 4, 10);
-        
-        //Add TextFields and Dropdown boxes to gridPane
-        gridPane.add(tfDriverID, 1, 1);
-        gridPane.add(tfDFirstName, 1, 2);
-        gridPane.add(tfDMI, 1, 3);
-        gridPane.add(tfDLastName, 1, 4);
-        gridPane.add(tfDSalary, 1, 6);
-        gridPane.add(tfDDateOfBirth, 1, 7);
-        gridPane.add(tfDCDL, 1, 8);
-        gridPane.add(tfDCDLDate, 1, 9);
-        gridPane.add(cbDContractorID = new ComboBox(olContractorID), 3, 1);
-        GridPane.setColumnSpan(cbDContractorID, 2);
-        cbDContractorID.setPrefWidth(200);
-        gridPane.add(tfDHouseNumber, 3, 2);
-        gridPane.add(tfDStreet, 3, 3);
-        gridPane.add(tfDCityCounty, 3, 4);
-        gridPane.add(cbDHomeState = new ComboBox(olStateList), 3, 5);
-        gridPane.add(tfDZipCode, 3, 6);
-        gridPane.add(cbDCountry = new ComboBox(olCountryList), 3, 7);
-        gridPane.add(tfDHireDate, 5, 2);
-        gridPane.add(tfDTerminationDate, 5, 3);
-        gridPane.add(tfDUpdatedBy, 5, 10);
-        
-        //Add Button to gridPane
-        btnDCommit.setPrefSize(100, 20);
-        gridPane.add(btnDCommit, 5, 0);
-        
-        return gridPane;
-    }
-    
-    public GridPane createEGridPane(){
-        GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(20, 20, 20, 20));
-        gridPane.setHgap(7); gridPane.setVgap(7);
-        gridPane.getColumnConstraints().addAll(col1,col2,col3,col4,col5,col6);
-        loadDriverIDFromDB();
-        
-        //set row constraints
-        for (int i = 0; i < 10; i++) {
-         RowConstraints row = new RowConstraints(25);
-         gridPane.getRowConstraints().add(row);
-            }
-        
-        //Create Equipment Labels
-        Label lblEquipment = new Label("Equipment");
-        lblEquipment.setFont(Font.font("Arial", 16));
-        Label lblEquipmentID = new Label("Equipment ID:");
-        lblEquipmentID.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblVin = new Label ("Vin:");
-        lblVin.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblMake = new Label ("Make:");
-        Label lblModel = new Label ("Model:");
-        Label lblYear = new Label ("Year:");
-        Label lblPriceAcquired = new Label ("Price Acquired: $");
-        Label lblLicenseNumber = new Label ("License Plate:");
-        Label lblEDriverID = new Label ("Driver:");
-        lblEDriverID.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        Label lblEUpdatedBy = new Label ("Updated By:");
-        lblEUpdatedBy.setFont(Font.font("Courier", FontWeight.BOLD, 12));
-        
-        //Position Label Text Right Alignment
-        GridPane.setHalignment(lblEquipmentID, HPos.RIGHT);
-        GridPane.setHalignment(lblVin, HPos.RIGHT);
-        GridPane.setHalignment(lblMake, HPos.RIGHT);
-        GridPane.setHalignment(lblModel, HPos.RIGHT);
-        GridPane.setHalignment(lblYear, HPos.RIGHT);
-        GridPane.setHalignment(lblPriceAcquired, HPos.RIGHT);
-        GridPane.setHalignment(lblLicenseNumber, HPos.RIGHT);
-        GridPane.setHalignment(lblEDriverID, HPos.RIGHT);
-        GridPane.setHalignment(lblEUpdatedBy, HPos.RIGHT);
-        
-        //Add Labels to gridPane
-        gridPane.add(lblEquipment, 0, 0);
-        gridPane.add(lblEquipmentID, 0, 1);
-        gridPane.add(lblVin, 0, 2);
-        gridPane.add(lblMake, 0, 3);
-        gridPane.add(lblModel, 0, 4);
-        gridPane.add(lblEDriverID, 2, 1);
-        gridPane.add(lblYear, 2, 2);
-        gridPane.add(lblPriceAcquired, 2, 3);
-        gridPane.add(lblLicenseNumber, 2, 4);
-        gridPane.add(lblEUpdatedBy, 4, 10);
-        
-        //Add TextFields and Dropdown box to gridPane
-        gridPane.add(tfEquipmentID, 1, 1);
-        gridPane.add(tfEVin, 1, 2);
-        gridPane.add(tfEMake, 1, 3);
-        gridPane.add(tfEModel, 1, 4);
-        gridPane.add(cbEDriverID = new ComboBox(olDriverID), 3, 1);
-        GridPane.setColumnSpan(cbEDriverID, 2);
-        cbEDriverID.setPrefWidth(200);
-        gridPane.add(tfEYear, 3, 2);
-        gridPane.add(tfEPriceAcquired, 3, 3);
-        gridPane.add(tfELicensePlateNumber, 3, 4);
-        gridPane.add(tfEUpdatedBy, 5, 10);
-        
-        //Add Button to gridPane
-        btnECommit.setPrefSize(100, 20);
-        gridPane.add(btnECommit, 5, 0);
-        
-        return gridPane;
     }
     
     public void assignContractorValues(){
@@ -1318,7 +1010,6 @@ public class Lab1 extends Application{
         }
     }
     
-    //NEED TO WORK ON THIS!!!
     public void insertContractorValuesIntoDB(int i){
         //Set up Contractor Array Values into SQL language
         //in order to insert into the Contractor Table in the Database
@@ -1326,27 +1017,15 @@ public class Lab1 extends Application{
         sqlQuery += "'" + arrayContractor[i].getContratorID().toString() + "', ";
         sqlQuery += "'" + arrayContractor[i].getFirstName() + "', ";
         sqlQuery += "'" + arrayContractor[i].getLastName() + "', ";
-        if ("NULL".equals(arrayContractor[i].getMiddleInitial()))
-            sqlQuery += arrayContractor[i].getMiddleInitial()+ ", ";
-        else sqlQuery += "'" + arrayContractor[i].getMiddleInitial() + "', ";
+        sqlQuery += "'" + arrayContractor[i].getMiddleInitial() + "', ";
         if (arrayContractor[i].getHouseNumber() == 0)
             sqlQuery += "NULL, ";
         else sqlQuery += "'" + arrayContractor[i].getHouseNumber().toString() + "', ";
-        if ("NULL".equals(arrayContractor[i].getStreet()))
-            sqlQuery += arrayContractor[i].getStreet() + ", ";
-        else sqlQuery += "'" + arrayContractor[i].getStreet()+ "', ";
-        if ("NULL".equals(arrayContractor[i].getCityCounty()))
-            sqlQuery += arrayContractor[i].getCityCounty()+ ", ";
-        else sqlQuery += "'" + arrayContractor[i].getCityCounty() + "', ";
-        if ("NULL".equals(arrayContractor[i].getStateAbb()))
-            sqlQuery += arrayContractor[i].getStateAbb()+ ", ";
-        else sqlQuery += "'" + arrayContractor[i].getStateAbb() + "', ";
-        if ("NULL".equals(arrayContractor[i].getCountryAbb()))
-            sqlQuery += arrayContractor[i].getCountryAbb()+ ", ";
-        else sqlQuery += "'" + arrayContractor[i].getCountryAbb() + "', ";
-        if ("NULL".equals(arrayContractor[i].getZipCode()))
-            sqlQuery += arrayContractor[i].getZipCode() + ", ";
-        else sqlQuery += "'" + arrayContractor[i].getZipCode() + "', ";
+        sqlQuery += "'" + arrayContractor[i].getStreet()+ "', ";
+        sqlQuery += "'" + arrayContractor[i].getCityCounty() + "', ";
+        sqlQuery += "'" + arrayContractor[i].getStateAbb() + "', ";
+        sqlQuery += "'" + arrayContractor[i].getCountryAbb() + "', ";
+         sqlQuery += "'" + arrayContractor[i].getZipCode() + "', ";
         if (arrayContractor[i].getFee() == 0)
             sqlQuery += "NULL, ";
         else sqlQuery += "'" + arrayContractor[i].getFee().toString() + "', ";
@@ -1357,43 +1036,24 @@ public class Lab1 extends Application{
         arrayContractor[i] = null;
     }
     
-    //NEED TO WORK ON THIS!!!
     public void insertDriverValuesIntoDB(){
         //Format a SQL Statement to insert Driver Values
         sqlQuery = "INSERT INTO JAVAUSER.DRIVER VALUES(";
         sqlQuery += "'" + Integer.toString(myDriver.getDriverID()) + "', ";
         sqlQuery += "'" + myDriver.getFirstName() + "', ";
         sqlQuery += "'" + myDriver.getLastName() + "', ";
-        if ("NULL".equals(myDriver.getMiddleInitial()))
-            sqlQuery += myDriver.getMiddleInitial() + ", ";
-        else sqlQuery += "'" + myDriver.getMiddleInitial() + "', ";
+        sqlQuery += "'" + myDriver.getMiddleInitial() + "', ";
         if (myDriver.getHouseNumber() == null)
             sqlQuery += "NULL, ";
         else sqlQuery += "'" + myDriver.getHouseNumber().toString()+ "', ";
-        if ("NULL".equals(myDriver.getStreet()))
-            sqlQuery += myDriver.getStreet() + ", ";
-        else sqlQuery += "'" + myDriver.getStreet() + "', ";
-        if ("NULL".equals(myDriver.getCityCounty()))
-            sqlQuery += myDriver.getCityCounty() + ", ";
-        else sqlQuery += "'" + myDriver.getCityCounty() + "', ";
-        if ("NULL".equals(myDriver.getStateAbb()))
-            sqlQuery += myDriver.getStateAbb() + ", ";
-        else sqlQuery += "'" + myDriver.getStateAbb() + "', ";
-        if ("NULL".equals(myDriver.getCountryAbb()))
-            sqlQuery += myDriver.getCountryAbb() + ", ";
-        else sqlQuery += "'" + myDriver.getCountryAbb() + "', ";
-        if ("NULL".equals(myDriver.getZipCode()))
-            sqlQuery += myDriver.getZipCode() + ", ";
-        else sqlQuery += "'" + myDriver.getZipCode() + "', ";
-        if ("NULL".equals(myDriver.getDateOfBirth()))
-            sqlQuery += "NULL, ";
-        else sqlQuery += "TO_DATE('" + myDriver.getDateOfBirth() + "', 'MM/DD/YYYY'), ";
-        if ("NULL".equals(myDriver.getCDL()))
-            sqlQuery += myDriver.getCDL() + ", ";
-        else sqlQuery += "'" + myDriver.getCDL() + "', ";
-        if ("NULL".equals(myDriver.getCDLDate()))
-            sqlQuery += "NULL, ";
-        else sqlQuery += "TO_DATE('" + myDriver.getCDLDate() + "', 'MM/DD/YYYY'), ";
+        sqlQuery += "'" + myDriver.getStreet() + "', ";
+        sqlQuery += "'" + myDriver.getCityCounty() + "', ";
+        sqlQuery += "'" + myDriver.getStateAbb() + "', ";
+        sqlQuery += "'" + myDriver.getCountryAbb() + "', ";
+        sqlQuery += "'" + myDriver.getZipCode() + "', ";
+        sqlQuery += "TO_DATE('" + myDriver.getDateOfBirth() + "', 'MM/DD/YYYY'), ";
+        sqlQuery += "'" + myDriver.getCDL() + "', ";
+        sqlQuery += "TO_DATE('" + myDriver.getCDLDate() + "', 'MM/DD/YYYY'), ";
         sqlQuery += "'" + myDriver.getLastUpdatedBy() + "', ";
         sqlQuery += "TO_DATE('" + myDriver.getLastUpdated() + "', 'MM/DD/YYYY'))";
         sendDBCommand(sqlQuery);
@@ -1402,12 +1062,8 @@ public class Lab1 extends Application{
         sqlQuery = "INSERT INTO JAVAUSER.DRIVERCONTRACTOR VALUES(";
         sqlQuery += "'" + Integer.toString(myDriver.getContractorID()) + "', ";
         sqlQuery += "'" + Integer.toString(myDriver.getDriverID()) + "', ";
-        if ("NULL".equals(myDriver.getHireDate()))
-            sqlQuery += "NULL, ";
-        else sqlQuery += "TO_DATE('" + myDriver.getHireDate() + "', 'MM/DD/YYYY'), ";
-        if ("NULL".equals(myDriver.getTerminationDate()))
-            sqlQuery += "NULL, ";
-        else sqlQuery += "TO_DATE('" + myDriver.getTerminationDate() + "', 'MM/DD/YYYY'), ";
+        sqlQuery += "TO_DATE('" + myDriver.getHireDate() + "', 'MM/DD/YYYY'), ";
+        sqlQuery += "TO_DATE('" + myDriver.getTerminationDate() + "', 'MM/DD/YYYY'), ";
         if (myDriver.getHouseNumber() == null)
             sqlQuery += "NULL, ";
         else sqlQuery += Double.toString(myDriver.getSalary()) + ", ";
@@ -1423,21 +1079,15 @@ public class Lab1 extends Application{
         sqlQuery = "INSERT INTO JAVAUSER.EQUIPMENT VALUES(";
         sqlQuery += "'" + myEquipment.getID().toString() + "', ";
         sqlQuery += "'" + myEquipment.getVinNumber() + "', ";
-        if ("NULL".equals(myEquipment.getMake()))
-            sqlQuery += myEquipment.getMake() + ", ";
-        else sqlQuery += "'" + myEquipment.getMake() + "', ";
-        if ("NULL".equals(myEquipment.getModel()))
-            sqlQuery += myEquipment.getModel() + ", ";
-        else sqlQuery += "'" + myEquipment.getModel() + "', ";
-        if (myEquipment.getEquipmentYear() == null)
+        sqlQuery += "'" + myEquipment.getMake() + "', ";
+        sqlQuery += "'" + myEquipment.getModel() + "', ";
+        if (myEquipment.getEquipmentYear() == 0)
             sqlQuery += "NULL, ";
         else sqlQuery += "'" + myEquipment.getEquipmentYear().toString()+ "', ";
-        if (myEquipment.getPriceAcquired() == null)
+        if (myEquipment.getPriceAcquired() == 0)
             sqlQuery += "NULL, ";
         else sqlQuery += myEquipment.getPriceAcquired().toString() + ", ";
-        if ("NULL".equals(myEquipment.getLicensePlateNumber()))
-            sqlQuery += myEquipment.getLicensePlateNumber() + ", ";
-        else sqlQuery += "'" + myEquipment.getLicensePlateNumber()+ "', ";
+        sqlQuery += "'" + myEquipment.getLicensePlateNumber()+ "', ";
         sqlQuery += "'" + myEquipment.getDriverID().toString()+ "', ";
         sqlQuery += "'" + myEquipment.getLastUpdatedBy() + "', ";
         sqlQuery += "TO_DATE('" + myEquipment.getLastUpdated() + "', 'MM/DD/YYYY'))";
@@ -1744,6 +1394,20 @@ public class Lab1 extends Application{
         }
     }
     
+    public void popUpAlert(String title, String message, TextField focusRequest){
+        alert.setHeaderText(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+        focusRequest.requestFocus();
+    }
+    
+    public void popUpAlert(String title, String message, ComboBox focusRequest){
+        alert.setHeaderText(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+        focusRequest.requestFocus();
+    }
+    
     public boolean checkForSameContractorID(){
         //check each location in contractor array for exact same integer
         for (int i=0;i<arrayContractor.length-1;i++){
@@ -1754,6 +1418,7 @@ public class Lab1 extends Application{
         return false;
     }
     
+    //CHECK AND SEE IF EASIER WAY
     public boolean checkForSameContractorName(){
         String arrayNameConcatenated = null;
         String tfNameConcatenated = null;
@@ -1778,41 +1443,22 @@ public class Lab1 extends Application{
     
     public boolean checkDateOfBirth(){
         //Date of Birth validations
-        if (isDateValid(tfDDateOfBirth.getText()) == false &&
-                    !"".equals(tfDDateOfBirth.getText())){
+        if (isDateValid(tfDDateOfBirth.getText()) == false && !"".equals(tfDDateOfBirth.getText())){
             return true;
         }
-        else if (tfDDateOfBirth.getText().length() < 10 &&
-                !"".equals(tfDDateOfBirth.getText())){
+        else if (tfDDateOfBirth.getText().length() < 10 && !"".equals(tfDDateOfBirth.getText())){
             return true;
         }
-        else if (!"".equals(tfDDateOfBirth.getText()) &&
-                isInteger(tfDDateOfBirth.getText().substring(0,2)) == false){
+        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(0,2)) == false){
             return true;
         }
-        else if (!"".equals(tfDDateOfBirth.getText()) &&
-                isInteger(tfDDateOfBirth.getText().substring(3,5)) == false){
+        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(3,5)) == false){
             return true;
         }
-        else if (!"".equals(tfDDateOfBirth.getText()) &&
-                isInteger(tfDDateOfBirth.getText().substring(6,10)) == false){
+        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(6,10)) == false){
             return true;
         }
         return false;
-    }
-    
-    public void popUpAlert(String title, String message, TextField focusRequest){
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-        alert.showAndWait();
-        focusRequest.requestFocus();
-    }
-    
-    public void popUpAlert(String title, String message, ComboBox focusRequest){
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-        alert.showAndWait();
-        focusRequest.requestFocus();
     }
     
     public boolean checkForSameDriverID(){
@@ -1950,6 +1596,315 @@ public class Lab1 extends Application{
             }catch (SQLException e){}  
         }
         
+    public HBox addTopHBox(){
+        HBox hbTopPane = new HBox();
+        hbTopPane.setPadding(new Insets(5, 12, 5, 12));
+        hbTopPane.setSpacing(10);
+        hbTopPane.setStyle("-fx-background-color: #0E3E6C;");
+        
+        //Add directions to the program
+        String Directions = "Created by Zachary Curry\n"
+                + "1. Please add Contractor before adding either a "
+                + "Driver or any Equipment \n"
+                + "2. Please add Driver before adding a piece of Equipment\n"
+                + "3. Dates should be entered as a \"DD/MM/YYYY\" format\n"
+                + "4. Please enter dollar amounts without the \"$\" in \"Fee\", \"Salary\", and \"Price Acquired\"\n"
+                + "5. Write your name in the Updated By box at the bottom right before Committing information\n"
+                + "6. Insert adds a Contractor to the array, max Contractors allowed at one time is 3\n"
+                + "7. Commit enters the values (from array) into the database (and clears the array)\n"
+                + "8. BOLD Lables indicate where information is required to commit to the database";
+        Text txtDirections = new Text(Directions);
+        txtDirections.setFill(Color.WHITE);
+        
+        hbTopPane.getChildren().add(txtDirections);
+
+        return hbTopPane;
+        }
+    
+    public HBox addBottomHBox(){
+        HBox hbBottomPane = new HBox();
+        hbBottomPane.setPadding(new Insets(15, 12, 15, 12));
+        hbBottomPane.setSpacing(10);
+        hbBottomPane.setStyle("-fx-background-color: #0E3E6C;");
+        
+        taDisplayData.setPrefSize(843, 75);
+        taDisplayData.setEditable(false);
+        
+        //add readonly text area to bottom pane
+        hbBottomPane.getChildren().addAll(taDisplayData);
+        
+        return hbBottomPane;
+        }
+    
+    public GridPane createCGridPane(){
+        GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(20, 20, 20, 20));
+        gridPane.setHgap(7); gridPane.setVgap(7);
+        gridPane.getColumnConstraints().addAll(col1,col2,col3,col4,col5,col6);
+        
+        //Set row constraints
+        for (int i = 0; i < 10; i++) {
+         RowConstraints row = new RowConstraints(25);
+         gridPane.getRowConstraints().add(row);
+            }
+        
+        //Create Contrator Labels
+        Label lblContractor = new Label("Contractor");
+        lblContractor.setFont(Font.font("Courier", 16));
+        Label lblContractorID = new Label("Contractor ID:");
+        lblContractorID.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblCFirstName = new Label("First Name:");
+        lblCFirstName.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblCMI = new Label ("MI:");
+        Label lblCLastName = new Label ("Last Name:");
+        lblCLastName.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblCHouseNumber = new Label ("House Number:");
+        Label lblCStreet = new Label ("Street:");
+        Label lblCCityCounty = new Label ("City or County:");
+        Label lblCState = new Label ("State:");
+        Label lblCZipCode = new Label ("Zip Code:");
+        Label lblCCountry = new Label ("Country:");
+        Label lblCFee = new Label ("Fee: $");
+        Label lblCUpdatedBy = new Label ("Updated By:");
+        lblCUpdatedBy.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+
+        //Position Label Text Right Alignment
+        GridPane.setHalignment(lblContractorID, HPos.RIGHT);
+        GridPane.setHalignment(lblCFirstName, HPos.RIGHT);
+        GridPane.setHalignment(lblCMI, HPos.RIGHT);
+        GridPane.setHalignment(lblCLastName, HPos.RIGHT);
+        GridPane.setHalignment(lblCHouseNumber, HPos.RIGHT);
+        GridPane.setHalignment(lblCStreet, HPos.RIGHT);
+        GridPane.setHalignment(lblCCityCounty, HPos.RIGHT);
+        GridPane.setHalignment(lblCState, HPos.RIGHT);
+        GridPane.setHalignment(lblCZipCode, HPos.RIGHT);
+        GridPane.setHalignment(lblCCountry, HPos.RIGHT);
+        GridPane.setHalignment(lblCFee, HPos.RIGHT);
+        GridPane.setHalignment(lblCUpdatedBy, HPos.RIGHT);
+        
+        //Add Labels to gridPane
+        gridPane.add(lblContractor, 0, 0);
+        gridPane.add(lblContractorID, 0, 1);
+        gridPane.add(lblCFirstName, 0, 2);
+        gridPane.add(lblCMI, 0, 3);
+        gridPane.add(lblCLastName, 0, 4);
+        gridPane.add(lblCFee, 0, 6);
+        gridPane.add(lblCHouseNumber, 2, 2);
+        gridPane.add(lblCStreet, 2, 3);
+        gridPane.add(lblCCityCounty, 2, 4);
+        gridPane.add(lblCState, 2, 5);
+        gridPane.add(lblCZipCode, 2, 6);
+        gridPane.add(lblCCountry, 2, 7);
+        gridPane.add(lblCUpdatedBy, 4, 10);
+        
+        //Add Textfields and DropDowns to gridPane
+        gridPane.add(tfContractorID, 1, 1);
+        gridPane.add(tfCFirstName, 1, 2);
+        gridPane.add(tfCMI, 1, 3);
+        gridPane.add(tfCLastName, 1, 4);
+        gridPane.add(tfCFee, 1, 6);
+        gridPane.add(tfCHouseNumber, 3, 2);
+        gridPane.add(tfCStreet, 3, 3);
+        gridPane.add(tfCCityCounty, 3, 4);
+        gridPane.add(cbCHomeState = new ComboBox(olStateList), 3, 5);
+        gridPane.add(tfCZipCode, 3, 6);
+        gridPane.add(cbCCountry = new ComboBox(olCountryList), 3, 7);
+        gridPane.add(tfCUpdatedBy, 5, 10);
+        
+        //Add Buttons to gridPane
+        btnCInsert.setPrefSize(100, 20);
+        btnCCommit.setPrefSize(100, 20);
+        gridPane.add(btnCInsert, 4, 0);
+        gridPane.add(btnCCommit, 5, 0);
+        
+        return gridPane;
+    }
+    
+    public GridPane createDGridPane(){
+        GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(20, 20, 20, 20));
+        gridPane.setHgap(7); gridPane.setVgap(7);
+        gridPane.getColumnConstraints().addAll(col1,col2,col3,col4,col5,col6);
+        loadContractorIDFromDB();
+        
+        //set row size on pane
+        for (int i = 0; i < 10; i++) {
+            RowConstraints row = new RowConstraints(25);
+            gridPane.getRowConstraints().add(row);
+        }
+        
+        //Create Driver Labels
+        Label lblDriver = new Label("Driver");
+        lblDriver.setFont(Font.font("Arial", 16));
+        Label lblDriverID = new Label("Driver ID:");
+        lblDriverID.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblDFirstName = new Label("First Name:");
+        lblDFirstName.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblDMI = new Label ("MI:");
+        Label lblDLastName = new Label ("Last Name:");
+        lblDLastName.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblDSalary = new Label ("Salary: $");
+        Label lblDContractorID = new Label ("Contractor:");
+        lblDContractorID.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblDHouseNumber = new Label ("House Number:");
+        Label lblDStreet = new Label ("Street:");
+        Label lblDCityCounty = new Label ("City or County:");
+        Label lblDState = new Label ("State:");
+        Label lblDZipCode = new Label ("Zip Code:");
+        Label lblDCountry = new Label ("Country:");
+        Label lblDOB = new Label ("Date of Birth:");
+        lblDOB.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblCDL = new Label ("CDL ID:");
+        Label lblCDLDate = new Label ("CDL Experation Date:");
+        Label lblDHireDate = new Label ("Hire Date:");
+        Label lblDTerminationDate = new Label ("Termination Date:");
+        Label lblDUpdatedBy = new Label ("Updated By:");
+        lblDUpdatedBy.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        
+        //Position Label Text Right Alignment
+        GridPane.setHalignment(lblDriverID, HPos.RIGHT);
+        GridPane.setHalignment(lblDFirstName, HPos.RIGHT);
+        GridPane.setHalignment(lblDMI, HPos.RIGHT);
+        GridPane.setHalignment(lblDLastName, HPos.RIGHT);
+        GridPane.setHalignment(lblDSalary, HPos.RIGHT);
+        GridPane.setHalignment(lblDOB, HPos.RIGHT);
+        GridPane.setHalignment(lblCDL, HPos.RIGHT);
+        GridPane.setHalignment(lblCDLDate, HPos.RIGHT);
+        GridPane.setHalignment(lblDContractorID, HPos.RIGHT);
+        GridPane.setHalignment(lblDHouseNumber, HPos.RIGHT);
+        GridPane.setHalignment(lblDStreet, HPos.RIGHT);
+        GridPane.setHalignment(lblDCityCounty, HPos.RIGHT);
+        GridPane.setHalignment(lblDState, HPos.RIGHT);
+        GridPane.setHalignment(lblDZipCode, HPos.RIGHT);
+        GridPane.setHalignment(lblDCountry, HPos.RIGHT);
+        GridPane.setHalignment(lblDHireDate, HPos.RIGHT);
+        GridPane.setHalignment(lblDTerminationDate, HPos.RIGHT);
+        GridPane.setHalignment(lblDUpdatedBy, HPos.RIGHT);
+
+        //Add Labels to gridPane
+        gridPane.add(lblDriver, 0, 0);
+        gridPane.add(lblDriverID, 0, 1);
+        gridPane.add(lblDFirstName, 0, 2);
+        gridPane.add(lblDMI, 0, 3);
+        gridPane.add(lblDLastName, 0, 4);
+        gridPane.add(lblDSalary, 0, 6);
+        gridPane.add(lblDOB, 0, 7);
+        gridPane.add(lblCDL, 0, 8);
+        gridPane.add(lblCDLDate, 0, 9);
+        gridPane.add(lblDContractorID, 2, 1);
+        gridPane.add(lblDHouseNumber, 2, 2);
+        gridPane.add(lblDStreet, 2, 3);
+        gridPane.add(lblDCityCounty, 2, 4);
+        gridPane.add(lblDState, 2, 5);
+        gridPane.add(lblDZipCode, 2, 6);
+        gridPane.add(lblDCountry, 2, 7);
+        gridPane.add(lblDHireDate, 4, 2);
+        gridPane.add(lblDTerminationDate, 4, 3);
+        gridPane.add(lblDUpdatedBy, 4, 10);
+        
+        //Add TextFields and Dropdown boxes to gridPane
+        gridPane.add(tfDriverID, 1, 1);
+        gridPane.add(tfDFirstName, 1, 2);
+        gridPane.add(tfDMI, 1, 3);
+        gridPane.add(tfDLastName, 1, 4);
+        gridPane.add(tfDSalary, 1, 6);
+        gridPane.add(tfDDateOfBirth, 1, 7);
+        gridPane.add(tfDCDL, 1, 8);
+        gridPane.add(tfDCDLDate, 1, 9);
+        gridPane.add(cbDContractorID = new ComboBox(olContractorID), 3, 1);
+        GridPane.setColumnSpan(cbDContractorID, 2);
+        cbDContractorID.setPrefWidth(200);
+        gridPane.add(tfDHouseNumber, 3, 2);
+        gridPane.add(tfDStreet, 3, 3);
+        gridPane.add(tfDCityCounty, 3, 4);
+        gridPane.add(cbDHomeState = new ComboBox(olStateList), 3, 5);
+        gridPane.add(tfDZipCode, 3, 6);
+        gridPane.add(cbDCountry = new ComboBox(olCountryList), 3, 7);
+        gridPane.add(tfDHireDate, 5, 2);
+        gridPane.add(tfDTerminationDate, 5, 3);
+        gridPane.add(tfDUpdatedBy, 5, 10);
+        
+        //Add Button to gridPane
+        btnDCommit.setPrefSize(100, 20);
+        gridPane.add(btnDCommit, 5, 0);
+        
+        return gridPane;
+    }
+    
+    public GridPane createEGridPane(){
+        GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(20, 20, 20, 20));
+        gridPane.setHgap(7); gridPane.setVgap(7);
+        gridPane.getColumnConstraints().addAll(col1,col2,col3,col4,col5,col6);
+        loadDriverIDFromDB();
+        
+        //set row constraints
+        for (int i = 0; i < 10; i++) {
+         RowConstraints row = new RowConstraints(25);
+         gridPane.getRowConstraints().add(row);
+            }
+        
+        //Create Equipment Labels
+        Label lblEquipment = new Label("Equipment");
+        lblEquipment.setFont(Font.font("Arial", 16));
+        Label lblEquipmentID = new Label("Equipment ID:");
+        lblEquipmentID.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblVin = new Label ("Vin:");
+        lblVin.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblMake = new Label ("Make:");
+        Label lblModel = new Label ("Model:");
+        Label lblYear = new Label ("Year:");
+        Label lblPriceAcquired = new Label ("Price Acquired: $");
+        Label lblLicenseNumber = new Label ("License Plate:");
+        Label lblEDriverID = new Label ("Driver:");
+        lblEDriverID.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        Label lblEUpdatedBy = new Label ("Updated By:");
+        lblEUpdatedBy.setFont(Font.font("Courier", FontWeight.BOLD, 12));
+        
+        //Position Label Text Right Alignment
+        GridPane.setHalignment(lblEquipmentID, HPos.RIGHT);
+        GridPane.setHalignment(lblVin, HPos.RIGHT);
+        GridPane.setHalignment(lblMake, HPos.RIGHT);
+        GridPane.setHalignment(lblModel, HPos.RIGHT);
+        GridPane.setHalignment(lblYear, HPos.RIGHT);
+        GridPane.setHalignment(lblPriceAcquired, HPos.RIGHT);
+        GridPane.setHalignment(lblLicenseNumber, HPos.RIGHT);
+        GridPane.setHalignment(lblEDriverID, HPos.RIGHT);
+        GridPane.setHalignment(lblEUpdatedBy, HPos.RIGHT);
+        
+        //Add Labels to gridPane
+        gridPane.add(lblEquipment, 0, 0);
+        gridPane.add(lblEquipmentID, 0, 1);
+        gridPane.add(lblVin, 0, 2);
+        gridPane.add(lblMake, 0, 3);
+        gridPane.add(lblModel, 0, 4);
+        gridPane.add(lblEDriverID, 2, 1);
+        gridPane.add(lblYear, 2, 2);
+        gridPane.add(lblPriceAcquired, 2, 3);
+        gridPane.add(lblLicenseNumber, 2, 4);
+        gridPane.add(lblEUpdatedBy, 4, 10);
+        
+        //Add TextFields and Dropdown box to gridPane
+        gridPane.add(tfEquipmentID, 1, 1);
+        gridPane.add(tfEVin, 1, 2);
+        gridPane.add(tfEMake, 1, 3);
+        gridPane.add(tfEModel, 1, 4);
+        gridPane.add(cbEDriverID = new ComboBox(olDriverID), 3, 1);
+        GridPane.setColumnSpan(cbEDriverID, 2);
+        cbEDriverID.setPrefWidth(200);
+        gridPane.add(tfEYear, 3, 2);
+        gridPane.add(tfEPriceAcquired, 3, 3);
+        gridPane.add(tfELicensePlateNumber, 3, 4);
+        gridPane.add(tfEUpdatedBy, 5, 10);
+        
+        //Add Button to gridPane
+        btnECommit.setPrefSize(100, 20);
+        gridPane.add(btnECommit, 5, 0);
+        
+        return gridPane;
+    }
+    
+    
     public static void main(String[] args) {
         Application.launch(args);   
     }

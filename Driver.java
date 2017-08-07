@@ -41,17 +41,17 @@ public class Driver
     }
     public void setDateOfBirth(String dateOfBirthPassed){
         if (dateOfBirthPassed.equals(""))
-            this.dateOfBirth = "NULL";
+            this.dateOfBirth = "'NULL'";
         else this.dateOfBirth = dateOfBirthPassed;
     }
     public void setCDL(String driverCDLPassed){
         if (driverCDLPassed.equals(""))
-            this.driverCDL = "NULL";
+            this.driverCDL = "'NULL'";
         else this.driverCDL = driverCDLPassed;
     }
     public void setCDLDate(String driverCDLDatePassed){
         if (driverCDLDatePassed.equals(""))
-            this.driverCDLDate = "NULL";
+            this.driverCDLDate = "'NULL'";
         else this.driverCDLDate = driverCDLDatePassed;
     }
     public void setHireDate(String hireDatePassed){

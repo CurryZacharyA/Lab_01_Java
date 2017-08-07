@@ -35,12 +35,12 @@ public class Equipment {
     }
     public void setMake(String makePassed){
         if (makePassed.equals(""))
-            this.make = "NULL";
+            this.make = "'NULL'";
         else this.make = makePassed;
     }
     public void setModel(String modelPassed){
         if (modelPassed.equals(""))
-            this.model = "NULL";
+            this.model = "'NULL'";
         else this.model = modelPassed;
     }
     public void setDriverID(Object driverIDPassed){                                 //Required - Driver ID
@@ -58,17 +58,17 @@ public class Equipment {
     }
     public void setLicensePlateNumber(String licenseNumberPassed){
         if (licenseNumberPassed.equals(""))
-            this.licensePlateNumber = "NULL";
+            this.licensePlateNumber = "'NULL'";
         else this.licensePlateNumber = licenseNumberPassed;
     }
     public void setLastUpdatedBy(String lastUpdatedByPassed){
         if (lastUpdatedByPassed.equals(""))
-            this.lastUpdatedBy = "NULL";
+            this.lastUpdatedBy = "'NULL'";
         else this.lastUpdatedBy = lastUpdatedByPassed;
     }
     public void setLastUpdated(String lastUpdatedPassed){
         if (lastUpdatedPassed.equals(""))
-            this.lastUpdated = "NULL";
+            this.lastUpdated = "'NULL'";
         else this.lastUpdated = lastUpdatedPassed;
     }
     
