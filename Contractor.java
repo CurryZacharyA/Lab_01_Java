@@ -1,4 +1,4 @@
-package Lab1;
+package Lab_01_Java;
 
 /*
 Zachary Curry
