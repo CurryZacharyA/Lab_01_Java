@@ -8,97 +8,112 @@ this academic work
 */
 
 public class Equipment {
-    Integer ID, EquipmentYear, DriverID;
-    String VinNumber, Make, Model, LicenseNumber, LastUpdatedBy, LastUpdated;
-    Double PriceAcquired;
+    private int equipmentID, equipmentYear, driverID;
+    private static int equipmentIDCounter = 0;
+    private String vinNumber, make, model, licensePlateNumber, lastUpdatedBy, lastUpdated;
+    private double priceAcquired;
     
     public Equipment(){
-        ID = 0;
-        VinNumber = "";
-        Make = "";
-        Model = "";
-        EquipmentYear = 0;
-        PriceAcquired = 0.0;
-        LicenseNumber = "";
-        DriverID = 0;
-        LastUpdatedBy = "";
-        LastUpdated = "";
+        equipmentID = ++equipmentIDCounter;
+        vinNumber = "";
+        make = "";
+        model = "";
+        equipmentYear = 0;
+        priceAcquired = 0.0;
+        licensePlateNumber = "";
+        driverID = 0;
+        lastUpdatedBy = "";
+        lastUpdated = "";
     }
     
     //Setter Methods
-    public void setID(int i){
-        this.ID = i;
+    public void setID(int equpimentIDPassed){                           //Required - Equipment ID
+        this.equipmentID = equpimentIDPassed;
     }
-    public void setVinNumber(String a){
-        this.VinNumber = a;
+    public void setVinNumber(String vinNumberPassed){                   //Required - Vin Number
+        this.vinNumber = vinNumberPassed;
     }
-    public void setMake(String a){
-        this.Make = a;
+    public void setMake(String makePassed){
+        if (makePassed.equals(""))
+            this.make = "NULL";
+        else this.make = makePassed;
     }
-    public void setModel(String a){
-        this.Model = a;
+    public void setModel(String modelPassed){
+        if (modelPassed.equals(""))
+            this.model = "NULL";
+        else this.model = modelPassed;
     }
-    public void setEquipmentYear(int i){
-        this.EquipmentYear = i;
+    public void setDriverID(Object driverIDPassed){                                 //Required - Driver ID
+        this.driverID = Integer.parseInt(driverIDPassed.toString());
     }
-    public void setPriceAcuired(double d){
-        this.PriceAcquired = d;
+    public void setEquipmentYear(String equipmentYearPassed){
+        if (equipmentYearPassed.equals(""))
+            this.equipmentYear = 0;                                                 //assign 0 if textbox empty
+        else this.equipmentYear = Integer.parseInt(equipmentYearPassed);            //assign int
     }
-    public void setLicenseNumber(String a){
-        this.LicenseNumber = a;
+    public void setPriceAcquired(String priceAcquiredPassed){
+        if (priceAcquiredPassed.equals(""))
+            this.priceAcquired = 0;                                                 //assign 0 if textbox empty
+        else this.priceAcquired = Double.parseDouble(priceAcquiredPassed);          //assign double
     }
-    public void setDriverID(int i){
-        this.DriverID = i;
+    public void setLicensePlateNumber(String licenseNumberPassed){
+        if (licenseNumberPassed.equals(""))
+            this.licensePlateNumber = "NULL";
+        else this.licensePlateNumber = licenseNumberPassed;
     }
-    public void setLastUpdatedBy(String a){
-        this.LastUpdatedBy = a;
+    public void setLastUpdatedBy(String lastUpdatedByPassed){
+        if (lastUpdatedByPassed.equals(""))
+            this.lastUpdatedBy = "NULL";
+        else this.lastUpdatedBy = lastUpdatedByPassed;
     }
-    public void setLastUpdated(String a){
-        this.LastUpdated = a;
+    public void setLastUpdated(String lastUpdatedPassed){
+        if (lastUpdatedPassed.equals(""))
+            this.lastUpdated = "NULL";
+        else this.lastUpdated = lastUpdatedPassed;
     }
     
     //Getter Methods
     public Integer getID(){
-        return this.ID;
+        return this.equipmentID;
     }
     public String getVinNumber(){
-        return this.VinNumber;
+        return this.vinNumber;
     }
     public String getMake(){
-        return this.Make;
+        return this.make;
     }
     public String getModel(){
-        return this.Model;
+        return this.model;
     }
     public Integer getEquipmentYear(){
-        return this.EquipmentYear;
+        return this.equipmentYear;
     }
     public Double getPriceAcquired(){
-        return this.PriceAcquired;
+        return this.priceAcquired;
     }
-    public String getLicenseNumber(){
-        return this.LicenseNumber;
+    public String getLicensePlateNumber(){
+        return this.licensePlateNumber;
     }
     public Integer getDriverID(){
-        return this.DriverID;
+        return this.driverID;
     }
     public String getLastUpdatedBy(){
-        return this.LastUpdatedBy;
+        return this.lastUpdatedBy;
     }
     public String getLastUpdated(){
-        return this.LastUpdated;
+        return this.lastUpdated;
     }
    
     public void reset(){
-        ID = 0;
-        VinNumber = "";
-        Make = "";
-        Model = "";
-        EquipmentYear = 0;
-        PriceAcquired = 0.0;
-        LicenseNumber = "";
-        DriverID = 0;
-        LastUpdatedBy = "";
-        LastUpdated = "";
+        equipmentID = 0;
+        vinNumber = "";
+        make = "";
+        model = "";
+        equipmentYear = 0;
+        priceAcquired = 0.0;
+        licensePlateNumber = "";
+        driverID = 0;
+        lastUpdatedBy = "";
+        lastUpdated = "";
     }
 }

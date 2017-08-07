@@ -132,7 +132,7 @@ public class Lab1 extends Application{
     TextField tfEModel = new TextField();
     TextField tfEYear = new TextField();
     TextField tfEPriceAcquired = new TextField();
-    TextField tfELicenseNumber = new TextField();
+    TextField tfELicensePlateNumber = new TextField();
     TextField tfEUpdatedBy = new TextField();
 
     //Create Button for Driver
@@ -143,6 +143,9 @@ public class Lab1 extends Application{
     
     //Create BorderPane to place hbox, vbox, buttons
     BorderPane layout = new BorderPane();
+    
+    //Create Alert
+    static Alert alert = new Alert(AlertType.ERROR);
     
     @Override
     public void start(Stage primaryStage){
@@ -315,7 +318,7 @@ public class Lab1 extends Application{
                         taDisplayData.setText(totalFees);
                     }catch (NullPointerException npe){
                         //if no fees enter for any contractor, display
-                        Alert alert = new Alert(AlertType.ERROR);
+                        
                         alert.setHeaderText("No Contractor Fees entered into Database");
                         alert.setContentText("Please commit atleast one Contractor Fee to the Database");
                         alert.showAndWait();
@@ -326,7 +329,7 @@ public class Lab1 extends Application{
                 }
                 else{
                     //if not contractors in database, display
-                    Alert alert = new Alert(AlertType.ERROR);
+                    
                     alert.setHeaderText("No Contractors in Database");
                     alert.setContentText("Please commit atleast one Contractor to the Database");
                     alert.showAndWait();
@@ -683,7 +686,7 @@ public class Lab1 extends Application{
         cbEDriverID.setPrefWidth(200);
         gridPane.add(tfEYear, 3, 2);
         gridPane.add(tfEPriceAcquired, 3, 3);
-        gridPane.add(tfELicenseNumber, 3, 4);
+        gridPane.add(tfELicensePlateNumber, 3, 4);
         gridPane.add(tfEUpdatedBy, 5, 10);
         
         //Add Button to gridPane
@@ -693,6 +696,63 @@ public class Lab1 extends Application{
         return gridPane;
     }
     
+    public void assignContractorValues(){
+        //Start at first free location in Contractor Array
+        for (int i=0; i<arrayContractor.length; i++){
+            if (arrayContractor[i] == null){
+                arrayContractor[i] = new Contractor();
+            }
+            arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
+            arrayContractor[i].setFirstName(tfCFirstName.getText());
+            arrayContractor[i].setMiddleInitial(tfCMI.getText());
+            arrayContractor[i].setLastName(tfCLastName.getText());
+            arrayContractor[i].setFee(tfCFee.getText());
+            arrayContractor[i].setHouseNumber(tfCHouseNumber.getText());
+            arrayContractor[i].setStreet(tfCStreet.getText());
+            arrayContractor[i].setCityCounty(tfCCityCounty.getText());
+            arrayContractor[i].setStateAbb(cbCHomeState);
+            arrayContractor[i].setZipCode(tfCZipCode.getText());
+            arrayContractor[i].setCountryAbb(cbCCountry);
+            arrayContractor[i].setLastUpdatedBy(tfCUpdatedBy.getText());
+            arrayContractor[i].setLastUpdated(getCurrentDate());
+            break;
+        }
+    }                      //looks good 8/7/17 11AM
+    
+    public void assignDriverValues(){
+        myDriver.setDriverID(Integer.parseInt(tfDriverID.getText()));
+        myDriver.setFirstName(tfDFirstName.getText());
+        myDriver.setMiddleInitial(tfDMI.getText());
+        myDriver.setLastName(tfDLastName.getText());
+        myDriver.setSalary(tfDSalary.getText());
+        myDriver.setDateOfBirth(tfDDateOfBirth.getText());
+        myDriver.setCDL(tfDCDL.getText());
+        myDriver.setCDLDate(tfDCDLDate.getText());
+        myDriver.setContractorID(cbDContractorID);
+        myDriver.setHouseNumber(tfDHouseNumber.getText());
+        myDriver.setStreet(tfDStreet.getText());
+        myDriver.setCityCounty(tfDCityCounty.getText());
+        myDriver.setStateAbb(cbDHomeState);
+        myDriver.setZipCode(tfDZipCode.getText());
+        myDriver.setCountryAbb(cbDCountry);
+        myDriver.setHireDate(tfDHireDate.getText());
+        myDriver.setTerminationDate(tfDTerminationDate.getText());
+        myDriver.setLastUpdatedBy(tfDUpdatedBy.getText());
+        myDriver.setLastUpdated(getCurrentDate());
+    }                          //looks good 8/7/17 11:50AM
+    
+    public void assignEquipmentValues(){
+        myEquipment.setID(Integer.parseInt(tfEquipmentID.getText()));
+        myEquipment.setVinNumber(tfEquipmentID.getText());
+        myEquipment.setMake(tfEMake.getText());
+        myEquipment.setModel(tfEModel.getText());
+        myEquipment.setDriverID(cbEDriverID);
+        myEquipment.setEquipmentYear(tfEYear.getText());
+        myEquipment.setPriceAcquired(tfEPriceAcquired.getText());
+        myEquipment.setLicensePlateNumber(tfELicensePlateNumber.getText());
+        myDriver.setLastUpdatedBy(tfDUpdatedBy.getText());
+        myDriver.setLastUpdated(getCurrentDate());
+    }                       //looks good 8/7/17 12:50PM
     
     //NEED TO WORK ON THIS!!!
     public void insertContractorValuesIntoDB(int i){
@@ -737,13 +797,13 @@ public class Lab1 extends Application{
     public void insertDriverValuesIntoDB(){
         //Format a SQL Statement to insert Driver Values
         sqlQuery = "INSERT INTO JAVAUSER.DRIVER VALUES(";
-        sqlQuery += "'" + myDriver.getDriverID().toString() + "', ";
+        sqlQuery += "'" + Integer.toString(myDriver.getDriverID()) + "', ";
         sqlQuery += "'" + myDriver.getFirstName() + "', ";
         sqlQuery += "'" + myDriver.getLastName() + "', ";
         if ("NULL".equals(myDriver.getMiddleInitial()))
             sqlQuery += myDriver.getMiddleInitial() + ", ";
         else sqlQuery += "'" + myDriver.getMiddleInitial() + "', ";
-        if (myDriver.HouseNumber == null)
+        if (myDriver.getHouseNumber() == null)
             sqlQuery += "NULL, ";
         else sqlQuery += "'" + myDriver.getHouseNumber().toString()+ "', ";
         if ("NULL".equals(myDriver.getStreet()))
@@ -776,17 +836,17 @@ public class Lab1 extends Application{
         
         //Format a SQL Statement to insert DriverContractor Values
         sqlQuery = "INSERT INTO JAVAUSER.DRIVERCONTRACTOR VALUES(";
-        sqlQuery += "'" + myDriver.getContractorID().toString() + "', ";
-        sqlQuery += "'" + myDriver.getDriverID().toString() + "', ";
+        sqlQuery += "'" + Integer.toString(myDriver.getContractorID()) + "', ";
+        sqlQuery += "'" + Integer.toString(myDriver.getDriverID()) + "', ";
         if ("NULL".equals(myDriver.getHireDate()))
             sqlQuery += "NULL, ";
         else sqlQuery += "TO_DATE('" + myDriver.getHireDate() + "', 'MM/DD/YYYY'), ";
         if ("NULL".equals(myDriver.getTerminationDate()))
             sqlQuery += "NULL, ";
         else sqlQuery += "TO_DATE('" + myDriver.getTerminationDate() + "', 'MM/DD/YYYY'), ";
-        if (myDriver.HouseNumber == null)
+        if (myDriver.getHouseNumber() == null)
             sqlQuery += "NULL, ";
-        else sqlQuery += myDriver.getSalary().toString() + ", ";
+        else sqlQuery += Double.toString(myDriver.getSalary()) + ", ";
         sqlQuery += "'" + myDriver.getLastUpdatedBy() + "', ";
         sqlQuery += "TO_DATE('" + myDriver.getLastUpdated() + "', 'MM/DD/YYYY'))";
         sendDBCommand(sqlQuery);
@@ -811,9 +871,9 @@ public class Lab1 extends Application{
         if (myEquipment.getPriceAcquired() == null)
             sqlQuery += "NULL, ";
         else sqlQuery += myEquipment.getPriceAcquired().toString() + ", ";
-        if ("NULL".equals(myEquipment.getLicenseNumber()))
-            sqlQuery += myEquipment.getLicenseNumber() + ", ";
-        else sqlQuery += "'" + myEquipment.getLicenseNumber()+ "', ";
+        if ("NULL".equals(myEquipment.getLicensePlateNumber()))
+            sqlQuery += myEquipment.getLicensePlateNumber() + ", ";
+        else sqlQuery += "'" + myEquipment.getLicensePlateNumber()+ "', ";
         sqlQuery += "'" + myEquipment.getDriverID().toString()+ "', ";
         sqlQuery += "'" + myEquipment.getLastUpdatedBy() + "', ";
         sqlQuery += "TO_DATE('" + myEquipment.getLastUpdated() + "', 'MM/DD/YYYY'))";
@@ -832,7 +892,7 @@ public class Lab1 extends Application{
             }
         }catch (SQLException e) {
         }
-    }
+    }                //looks good
     
     public void loadFromDB(String localSqlQuery, ArrayList<String> localArrayList){
         try{
@@ -847,38 +907,38 @@ public class Lab1 extends Application{
                 localArrayList.add(nameConcatenated);
             }
         }catch (SQLException e) {}
-    }
+    }   //looks good
 
     public void loadStatesDataFromDB(){
         //Populate states into dropdowns
         Lab1.this.loadFromDB("SELECT STATEABB FROM JAVAUSER.HOMESTATE", stateList);
         olStateList = FXCollections.observableArrayList(stateList);
-    }
+    }                                               //looks good
     
     public void loadCountriesDataFromDB(){
         //populate countries into dropdowns
         Lab1.this.loadFromDB("SELECT COUNTRYABB FROM JAVAUSER.COUNTRY", countryList);
         olCountryList = FXCollections.observableArrayList(countryList);
-    }
+    }                                           //looks good
     
     public void loadContractorIDFromDB(){
         //populate contractors into contractor dropdown
         loadFromDB("SELECT CONTRACTORID, FIRSTNAME, LASTNAME, "
                 + "MIDDLEINITIAL FROM CONTRACTOR", driverContractorList);
         olContractorID = FXCollections.observableArrayList(driverContractorList);
-    }
+    }                                           //looks good
     
     public void loadDriverIDFromDB(){
         //populate drivers on driver dropdown
         loadFromDB("SELECT DRIVERID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
                 + "FROM DRIVER", equipmentDriverList);
         olDriverID = FXCollections.observableArrayList(equipmentDriverList);
-    }
+    }                                               //looks good
     
     public void commitContractor(){
         //Check first location in contractor array
         if (arrayContractor[0] == null){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Contractor Array Empty");
             alert.setContentText("Please insert a contractor before Committing");
             alert.showAndWait();
@@ -913,7 +973,7 @@ public class Lab1 extends Application{
     public void insertButtonContractor(){
         //Check to see if ContractorID Field Empty
         if ("".equals(tfContractorID.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Contractor ID can't be empty");
             alert.setContentText("Please enter a Contractor ID");
             alert.showAndWait();
@@ -921,7 +981,7 @@ public class Lab1 extends Application{
         }
         //Check to see if ContractorID fits into an integer constraint
         else if (tfContractorID.getText().length() > 10){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Contractor ID Too Long");
             alert.setContentText("Only 10 characters allowed for a Contractor ID");
             alert.showAndWait();
@@ -929,7 +989,7 @@ public class Lab1 extends Application{
         }
         //Check to see if ContractorID is a number; acknowledge the max integer constraint
         else if (isInteger(tfContractorID.getText()) == false){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Contractor ID must be an integer");
             alert.setContentText("Please enter an number for Contractor ID\n"
                     + "\n"
@@ -939,7 +999,7 @@ public class Lab1 extends Application{
         }
         //Check to see if ContractorID is a positive number
         else if (Integer.parseInt(tfContractorID.getText()) < 0){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Contractor ID Negative");
             alert.setContentText("Contractor ID must be a positive number");
             alert.showAndWait();
@@ -947,7 +1007,7 @@ public class Lab1 extends Application{
         }
         //Check to see if FirstName is left blank
         else if("".equals(tfCFirstName.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
+            
                 alert.setHeaderText("No First Name Specified");
                 alert.setContentText("First Name can't be left blank");
                 alert.showAndWait();
@@ -955,7 +1015,7 @@ public class Lab1 extends Application{
         }
         //Check to see if FirstName length is less than 20
         else if (tfCFirstName.getText().length() > 20){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("First Name Too Long");
             alert.setContentText("Only 20 characters allowed for a First Name");
             alert.showAndWait();
@@ -963,7 +1023,7 @@ public class Lab1 extends Application{
         }
         //Check to see if MI is only 1 character
         else if (tfCMI.getText().length() > 1){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Middle Initial Too Long");
             alert.setContentText("Only 1 character allowed for a Middle Initial");
             alert.showAndWait();
@@ -971,7 +1031,7 @@ public class Lab1 extends Application{
         }
         //Check to see if LastName is left blank
         else if("".equals(tfCLastName.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
+            
                 alert.setHeaderText("No Last Name Specified");
                 alert.setContentText("Last Name can't be left blank");
                 alert.showAndWait();
@@ -979,7 +1039,7 @@ public class Lab1 extends Application{
         }
         //Check to see if LastName is less than 20
         else if (tfCLastName.getText().length() > 20){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Last Name Too Long");
             alert.setContentText("Only 20 characters allowed for a Last Name");
             alert.showAndWait();
@@ -987,7 +1047,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Fee is a double IF the field is not empty
         else if(isDouble(tfCFee.getText()) == false && !"".equals(tfCFee.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Fee must be a double");
             alert.setContentText("Please enter a numeric amount for Fee");
             alert.showAndWait();
@@ -997,7 +1057,7 @@ public class Lab1 extends Application{
         else if(isDouble(tfCFee.getText()) == true &&
                 !"".equals(tfCFee.getText()) &&
                 Double.parseDouble(tfCFee.getText()) < 0){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Fee must be a positive value");
             alert.setContentText("Please enter a positive value for Fee");
             alert.showAndWait();
@@ -1008,7 +1068,7 @@ public class Lab1 extends Application{
         else if (tfCFee.getText().contains(".") == true &&
                     tfCFee.getText().substring(tfCFee.getText().indexOf("."),
                     tfCFee.getText().length()).length() > 3){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Fee has too many decimal places");
             alert.setContentText("Please reduce amount of decimal places for the Fee");
             alert.showAndWait();
@@ -1018,7 +1078,7 @@ public class Lab1 extends Application{
         else if (tfCFee.getText().contains(".") == true &&
                     tfCFee.getText().substring(1,
                     tfCFee.getText().indexOf(".")).length() > 6){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Fee Too Long");
             alert.setContentText("Fee must be less than $1,000,000.00");
             alert.showAndWait();
@@ -1026,7 +1086,7 @@ public class Lab1 extends Application{
         //Check to see if Fee is less than $1,000,000.00
         else if (tfCFee.getText().contains(".") == false &&
                     tfCFee.getText().length() > 6){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Fee Too Long");
             alert.setContentText("Fee must be less than $1,000,000.00");
             alert.showAndWait();
@@ -1034,7 +1094,7 @@ public class Lab1 extends Application{
         }
         //Check to see if House Number fits into an integer constraint
         else if (tfCHouseNumber.getText().length() > 10){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("House Number Too Long");
             alert.setContentText("Only 10 characters allowed for a House Number");
             alert.showAndWait();
@@ -1043,7 +1103,7 @@ public class Lab1 extends Application{
         //Check to see if House number is a number; acknowledge the max integer constraint
         else if(isInteger(tfCHouseNumber.getText()) == false &&
                 !"".equals(tfCHouseNumber.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("House Number must be an integer");
             alert.setContentText("Please enter a number for House Number\n"
                     + "\n"
@@ -1053,7 +1113,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Street is less than 50 characters
         else if (tfCStreet.getText().length() > 50){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Street Too Long");
             alert.setContentText("Only 50 characters allowed for a Street");
             alert.showAndWait();
@@ -1061,7 +1121,7 @@ public class Lab1 extends Application{
         }
         //Check to see if City or County is less than 40 characters
         else if (tfCCityCounty.getText().length() > 40){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("City / County Too Long");
             alert.setContentText("Only 40 characters allowed for a City or County");
             alert.showAndWait();
@@ -1069,7 +1129,7 @@ public class Lab1 extends Application{
         }
         //Check to see if ZipCode is greater than 5 characters
         else if (tfCZipCode.getText().length() > 5){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Zip Code Too Long");
             alert.setContentText("Only 5 characters allowed for a Zip Code");
             alert.showAndWait();
@@ -1078,7 +1138,7 @@ public class Lab1 extends Application{
         //Check to see if ZipCode is less than 5 characters
         else if (!"".equals(tfCZipCode.getText()) &&
                 tfCZipCode.getText().length() < 5){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Zip Code Too Short");
             alert.setContentText("Zip Code must have 5 characters");
             alert.showAndWait();
@@ -1086,7 +1146,7 @@ public class Lab1 extends Application{
         }
         //Check to see if ZipCode is a number IF the field is not empty
         else if(isInteger(tfCZipCode.getText()) == false && !"".equals(tfCZipCode.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Zip Code must be an integer");
             alert.setContentText("Please enter a number for Zip Code");
             alert.showAndWait();
@@ -1094,7 +1154,7 @@ public class Lab1 extends Application{
         }
         //Check to see if UpdatedBy is null
         else if("".equals(tfCUpdatedBy.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("No Ownership to Update Specified");
             alert.setContentText("Please write your name in the \"Updated By\" box");
             alert.showAndWait();
@@ -1102,7 +1162,7 @@ public class Lab1 extends Application{
         }
         //Check to see if UpdatedBy is less than 20 characters
         else if (tfCUpdatedBy.getText().length()> 20){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Updated By Too Long");
             alert.setContentText("Only 20 characters allowed for an Updated By Ownership");
             alert.showAndWait();
@@ -1110,7 +1170,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Contractor array last location is empty
         else if (arrayContractor[FIXED_ARRAY_SIZE-1] != null){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Contractor Array is Full!");
             alert.setContentText("You must commit the Contractor Array \n"
                     + "before adding a new Contractor!");
@@ -1124,7 +1184,7 @@ public class Lab1 extends Application{
                 if (arrayContractor[i] != null){
                     if (checkForSameContractorID()){
                         //if same id, display
-                        Alert alert = new Alert(AlertType.ERROR);
+                        
                         alert.setHeaderText("Contractor ID unique");
                         alert.setContentText("Please use a different Contractor ID");
                         alert.showAndWait();
@@ -1133,7 +1193,7 @@ public class Lab1 extends Application{
                     }
                     else if (checkForSameContractorName()){
                         //if same exact name, display
-                        Alert alert = new Alert(AlertType.ERROR);
+                        
                         alert.setHeaderText("Contractor Name must be unique");
                         alert.setContentText("Contractor Name already exists:\n"
                             + "Please enter a drifferent Contractor Name");
@@ -1159,7 +1219,7 @@ public class Lab1 extends Application{
         //check each location in contractor array for exact same integer
         for (int i=0;i<arrayContractor.length-1;i++){
             if(arrayContractor[i] != null)
-                if(arrayContractor[i].ContractorID == Integer.parseInt(tfContractorID.getText()))
+                if(arrayContractor[i].getContratorID() == Integer.parseInt(tfContractorID.getText()))
                     return true;
         }
         return false;
@@ -1187,29 +1247,6 @@ public class Lab1 extends Application{
         return false;
     }
     
-    public void assignContractorValues(){
-        //Start at first free location in Contractor Array
-        for (int i=0; i<arrayContractor.length; i++){
-            if (arrayContractor[i] == null){
-                arrayContractor[i] = new Contractor();
-            }
-            arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
-            arrayContractor[i].setFirstName(tfCFirstName.getText());
-            arrayContractor[i].setMiddleInitial(tfCMI.getText());
-            arrayContractor[i].setLastName(tfCLastName.getText());
-            arrayContractor[i].setFee(tfCFee.getText());
-            arrayContractor[i].setHouseNumber(tfCHouseNumber.getText());
-            arrayContractor[i].setStreet(tfCStreet.getText());
-            arrayContractor[i].setCityCounty(tfCCityCounty.getText());
-            arrayContractor[i].setStateAbb(cbCHomeState);
-            arrayContractor[i].setZipCode(tfCZipCode.getText());
-            arrayContractor[i].setCountryAbb(cbCCountry);
-            arrayContractor[i].setLastUpdatedBy(tfCUpdatedBy.getText());
-            arrayContractor[i].setLastUpdated(getCurrentDate());
-            break;
-        }
-    }                       //looks good 8/7/17 11AM
-    
     public boolean checkDateOfBirth(){
         //Date of Birth validations
         if (isDateValid(tfDDateOfBirth.getText()) == false &&
@@ -1233,6 +1270,20 @@ public class Lab1 extends Application{
             return true;
         }
         return false;
+    }
+    
+    public void popUpAlert(String title, String message, TextField focusRequest){
+        alert.setHeaderText(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+        focusRequest.requestFocus();
+    }
+    
+    public void popUpAlert(String title, String message, ComboBox focusRequest){
+        alert.setHeaderText(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+        focusRequest.requestFocus();
     }
     
     public void commitDriver() throws ParseException{
@@ -1268,578 +1319,292 @@ public class Lab1 extends Application{
 
         //Check to see if DriverID is empty
         if ("".equals(tfDriverID.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver ID can't be empty");
-            alert.setContentText("Please enter a Driver ID");
-            alert.showAndWait();
-            tfDriverID.requestFocus();
+            popUpAlert("Driver ID can't be empty", "Please enter a Driver ID", tfDriverID);
         }
         //Check to see if DriverID has already been used
         else if(checkForSameDriverID()){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver ID must be unique");
-            alert.setContentText("Please enter a drifferent Driver ID");
-            alert.showAndWait();
-            tfDriverID.requestFocus();
+            popUpAlert("Driver ID must be unique", "Please enter a drifferent Driver ID", tfDriverID);
         }
         //Check to see if DriverName is unique
         else if(checkForSameDriverName()){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver Name must be unique");
-            alert.setContentText("Driver Name already exists");
-            alert.showAndWait();
-            tfDFirstName.requestFocus();
+            popUpAlert("Driver Name must be unique", "Driver Name already exists", tfDFirstName);
         }
         //Check to see if DriverID fits into an integer constraint
         else if (tfDriverID.getText().length()> 10){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver ID Too Long");
-            alert.setContentText("Only 10 characters allowed for a Driver ID");
-            alert.showAndWait();
-            tfDriverID.requestFocus();
+            popUpAlert("Driver ID Too Long", "Only 10 characters allowed for a Driver ID", tfDriverID);
         }
         //Check to see if DriverID is a number;
         //acknowledge the max integer constraint
         else if (isInteger(tfDriverID.getText()) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver ID must be an integer");
-            alert.setContentText("Please enter an number for Driver ID\n"
+            popUpAlert("Driver ID must be an integer", "Please enter an number for Driver ID\n"
                     + "\n"
-                    + "Contractor ID must be less than 2,147,483,648");
-            alert.showAndWait();
-            tfDriverID.requestFocus();
+                    + "Contractor ID must be less than 2,147,483,648", tfDriverID);
         }
         //Check to see if DriverID is a positive number
         else if (Integer.parseInt(tfDriverID.getText()) < 0){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver ID Negative");
-            alert.setContentText("Driver ID must be a positive number");
-            alert.showAndWait();
-            tfDriverID.requestFocus();
+            popUpAlert("Driver ID Negative", "Driver ID must be a positive number", tfDriverID);
         }
         //Check to see if FirstName is left blank
         else if("".equals(tfDFirstName.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-                alert.setHeaderText("No First Name Specified");
-                alert.setContentText("First Name can't be left blank");
-                alert.showAndWait();
-                tfDFirstName.requestFocus();
+            popUpAlert("No First Name Specified", "First Name can't be left blank", tfDFirstName);
         }
         //Check to see if FirstName length is less than 20
         else if (tfDFirstName.getText().length()> 20){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("First Name Too Long");
-            alert.setContentText("Only 20 characters allowed for a First Name");
-            alert.showAndWait();
-            tfDFirstName.requestFocus();
+            popUpAlert("First Name Too Long", "Only 20 characters allowed for a First Name", tfDFirstName);
         }
         //Check to see if MI is only 1 character
         else if (tfDMI.getText().length()> 1){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Middle Initial Too Long");
-            alert.setContentText("Only 1 character allowed for a Middle Initial");
-            alert.showAndWait();
-            tfDMI.requestFocus();
+            popUpAlert("Middle Initial Too Long", "Only 1 character allowed for a Middle Initial", tfDMI);
         }
         //Check to see if LastName is left blank
         else if("".equals(tfDLastName.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-                alert.setHeaderText("No Last Name Specified");
-                alert.setContentText("Last Name can't be left blank");
-                alert.showAndWait();
-                tfDLastName.requestFocus();
+            popUpAlert("No Last Name Specified", "Last Name can't be left blank", tfDLastName);
         }
         //Check to see if LastName is less than 20
         else if (tfDLastName.getText().length()> 20){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Last Name Too Long");
-            alert.setContentText("Only 20 characters allowed for a Last Name");
-            alert.showAndWait();
-            tfDLastName.requestFocus();
+            popUpAlert("Last Name Too Long", "Only 20 characters allowed for a Last Name", tfDLastName);
         }
         //Check to see if Salary is a double IF the field is not empty
-        else if(isDouble(tfDSalary.getText()) == false &&
-                !"".equals(tfDSalary.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Salary must be a double");
-            alert.setContentText("Please enter a numeric amount for Salary");
-            alert.showAndWait();
-            tfDSalary.requestFocus();
+        else if(isDouble(tfDSalary.getText()) == false && !"".equals(tfDSalary.getText())){
+            popUpAlert("Salary must be a double", "Please enter a numeric amount for Salary", tfDSalary);
         }
         //Check to see if Salary is a positive number
-        else if(isDouble(tfDSalary.getText()) == true &&
-                !"".equals(tfDSalary.getText()) &&
+        else if(isDouble(tfDSalary.getText()) == true && !"".equals(tfDSalary.getText()) &&
                 Double.parseDouble(tfDSalary.getText()) < 0){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Salary must be a positive value");
-            alert.setContentText("Please enter a positive value for Salary");
-            alert.showAndWait();
-            tfDSalary.requestFocus();
+            popUpAlert("Salary must be a positive value", "Please enter a positive value for Salary", tfDSalary);
         }
         //Check to see if Salary field contains a decimal point AND IF SO
         //...check to make sure it only contains 2 decimal places or less
         else if (tfDSalary.getText().contains(".") == true &&
                     tfDSalary.getText().substring(tfDSalary.getText().indexOf("."),
                     tfDSalary.getText().length()).length() > 3){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Salary has too many decimal places");
-            alert.setContentText("Please reduce amount of decimal places for the Salary");
-            alert.showAndWait();
-            tfDSalary.requestFocus();
+            popUpAlert("Salary has too many decimal places", "Please reduce amount of decimal places for the Salary", tfDSalary);
         }
         //Check to see if Salary falls within Decimal (10,2) constraints
-        else if (tfDSalary.getText().contains(".") == true &&
-                    tfDSalary.getText().substring(1,
+        else if (tfDSalary.getText().contains(".") == true && tfDSalary.getText().substring(1,
                     tfDSalary.getText().indexOf(".")).length() > 8){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Salary Too Long");
-            alert.setContentText("Salary must be less than $100,000,000.00");
-            alert.showAndWait();
-            tfDSalary.requestFocus();
+            popUpAlert("Salary Too Long", "Salary must be less than $100,000,000.00", tfDSalary);
         }
         //Check to see if Salary is less than $10,000,000,000.00
         else if (tfDSalary.getText().contains(".") == false &&
                     tfDSalary.getText().length() > 8){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Salary Too Long");
-            alert.setContentText("Salary must be less than $100,000,000.00");
-            alert.showAndWait();
-            tfDSalary.requestFocus();
+            popUpAlert("Salary Too Long", "Salary must be less than $100,000,000.00", tfDSalary);
         }
         //Check to see if DOB is empty
         else if ("".equals(tfDDateOfBirth.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Date of Birth can't be empty");
-            alert.setContentText("Please enter a Date of Birth");
-            alert.showAndWait();
-            tfDriverID.requestFocus();
+            popUpAlert("Date of Birth can't be empty", "Please enter a Date of Birth", tfDriverID);
         }
         //Date of Birth validations
         else if (isDateValid(tfDDateOfBirth.getText()) == false &&
                     !"".equals(tfDDateOfBirth.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Not a Valid Date of Birth");
-            alert.setContentText("Not a Real Date\n"
-                    + "Please write a Date of Birth in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDDateOfBirth.requestFocus();
+            popUpAlert("Not a Valid Date of Birth", "Not a Real Date\n"
+                    + "Please write a Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
         }
         else if (tfDDateOfBirth.getText().length() < 10 &&
                 !"".equals(tfDDateOfBirth.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Date of Birth Too Short");
-            alert.setContentText("Please write Date of Birth in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDDateOfBirth.requestFocus();
+            popUpAlert("Date of Birth Too Short", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
         }
         else if (tfDDateOfBirth.getText().length() > 10 &&
                 !"".equals(tfDDateOfBirth.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Date of Birth Too Long");
-            alert.setContentText("Please write Date of Birth in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDDateOfBirth.requestFocus();
+            popUpAlert("Date of Birth Too Long", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
         }
-        else if (!"".equals(tfDDateOfBirth.getText()) &&
-                isInteger(tfDDateOfBirth.getText().substring(0,2)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Date of Birth written incorrectly");
-            alert.setContentText("Please write Date of Birth in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDDateOfBirth.requestFocus();
+        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(0,2)) == false){
+            popUpAlert("Date of Birth written incorrectly", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
         }
-        else if (!"".equals(tfDDateOfBirth.getText()) &&
-                isInteger(tfDDateOfBirth.getText().substring(3,5)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Date of Birth written incorrectly");
-            alert.setContentText("Please write Date of Birth in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDDateOfBirth.requestFocus();
+        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(3,5)) == false){
+            popUpAlert("Date of Birth written incorrectly", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
         }
-        else if (!"".equals(tfDDateOfBirth.getText()) &&
-                isInteger(tfDDateOfBirth.getText().substring(6,10)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Date of Birth written incorrectly");
-            alert.setContentText("Please write Date of Birth in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDDateOfBirth.requestFocus();
+        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(6,10)) == false){
+            popUpAlert("Date of Birth written incorrectly", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
         }
         //Check to see if Driver is atleast 25 years old
-        else if (!"".equals(tfDDateOfBirth.getText()) &&
-                sdf.parse(tfDDateOfBirth.getText()).after(
-                sdf.parse(tooYoung))){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver is Too Young!");
-            alert.setContentText("Driver must be at least 25 years old");
-            alert.showAndWait();
-            tfDDateOfBirth.requestFocus();
+        else if (!"".equals(tfDDateOfBirth.getText()) && sdf.parse(tfDDateOfBirth.getText()).after(sdf.parse(tooYoung))){
+            popUpAlert("Driver is Too Young!", "Driver must be at least 25 years old", tfDDateOfBirth);
         }
         //Check to see if Driver is younger than 75 years old
-        else if (!"".equals(tfDDateOfBirth.getText()) &&
-                sdf.parse(tfDDateOfBirth.getText()).before(
-                sdf.parse(tooOld))){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver is Too Old!");
-            alert.setContentText("Driver must be younger than 75 years old");
-            alert.showAndWait();
-            tfDDateOfBirth.requestFocus();
+        else if (!"".equals(tfDDateOfBirth.getText()) && sdf.parse(tfDDateOfBirth.getText()).before(sdf.parse(tooOld))){
+            popUpAlert("Driver is Too Old!", "Driver must be younger than 75 years old", tfDDateOfBirth);
         }
         //Check to see if CDL is less than 40 characters
         else if (tfDCDL.getText().length()> 40){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("CDL ID Too Long");
-            alert.setContentText("Only 40 characters allowed for a CDL ID");
-            alert.showAndWait();
-            tfDCDL.requestFocus();
+            popUpAlert("CDL ID Too Long", "Only 40 characters allowed for a CDL ID", tfDCDL);
         }
         //CDL Experation Date Validation
-        else if (isDateValid(tfDCDLDate.getText()) == false &&
-                    !"".equals(tfDCDLDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Not a Valid CDL Experation Date");
-            alert.setContentText("Not a Real Date\n"
-                    + "Please write CDL Experation Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDCDLDate.requestFocus();
+        else if (isDateValid(tfDCDLDate.getText()) == false && !"".equals(tfDCDLDate.getText())){
+            popUpAlert("Not a Valid CDL Experation Date", "Not a Real Date\n"
+                    + "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
         }
-        else if (tfDCDLDate.getText().length() < 10 &&
-                !"".equals(tfDCDLDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("CDL Experation Date Too Short");
-            alert.setContentText("Please write CDL Experation Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDCDLDate.requestFocus();
+        else if (tfDCDLDate.getText().length() < 10 && !"".equals(tfDCDLDate.getText())){
+            popUpAlert("CDL Experation Date Too Short", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
         }
-        else if (tfDCDLDate.getText().length() > 10 &&
-                !"".equals(tfDCDLDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("CDL Experation Date Too Long");
-            alert.setContentText("Please write CDL Experation Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDCDLDate.requestFocus();
+        else if (tfDCDLDate.getText().length() > 10 && !"".equals(tfDCDLDate.getText())){
+            popUpAlert("CDL Experation Date Too Long", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
         }
-        else if (!"".equals(tfDCDLDate.getText()) &&
-                isInteger(tfDCDLDate.getText().substring(0,2)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("CDL Experation Date written incorrectly");
-            alert.setContentText("Please write CDL Experation Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDCDLDate.requestFocus();
+        else if (!"".equals(tfDCDLDate.getText()) && isInteger(tfDCDLDate.getText().substring(0,2)) == false){
+            popUpAlert("CDL Experation Date written incorrectly", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
         }
-        else if (!"".equals(tfDCDLDate.getText()) &&
-                isInteger(tfDCDLDate.getText().substring(3,5)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("CDL Experation Date written incorrectly");
-            alert.setContentText("Please write CDL Experation Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDCDLDate.requestFocus();
+        else if (!"".equals(tfDCDLDate.getText()) && isInteger(tfDCDLDate.getText().substring(3,5)) == false){
+            popUpAlert("CDL Experation Date written incorrectly", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
         }
-        else if (!"".equals(tfDCDLDate.getText()) &&
-                isInteger(tfDCDLDate.getText().substring(6,10)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("CDL Experation Date written incorrectly");
-            alert.setContentText("Please write CDL Experation Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDCDLDate.requestFocus();
+        else if (!"".equals(tfDCDLDate.getText()) &&isInteger(tfDCDLDate.getText().substring(6,10)) == false){
+            popUpAlert("CDL Experation Date written incorrectly", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
         }
         //Make sure CDL is not expired
-        else if (!"".equals(tfDCDLDate.getText()) &&
-                sdf.parse(tfDCDLDate.getText()).before(
-                sdf.parse(currentDate))){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("CDL is Expired");
-            alert.setContentText("Driver must have a Non-Expired CDL");
-            alert.showAndWait();
-            tfDCDLDate.requestFocus();
+        else if (!"".equals(tfDCDLDate.getText()) && sdf.parse(tfDCDLDate.getText()).before(sdf.parse(currentDate))){
+            popUpAlert("CDL is Expired", "Driver must have a Non-Expired CDL", tfDCDLDate);
         }
         //Check to see if Contractor is left blank
         else if(cbDContractorID.getValue() == null){
-            Alert alert = new Alert(AlertType.ERROR);
-                alert.setHeaderText("No Contractor Specified");
-                alert.setContentText("Contractor can't be left blank");
-                alert.showAndWait();
-                cbDContractorID.requestFocus();
+            popUpAlert("No Contractor Specified", "Contractor can't be left blank", cbDContractorID);
         }
         //Check to see if House Number fits into an integer constraint
         else if (tfDHouseNumber.getText().length()> 10){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("House Number Too Long");
-            alert.setContentText("Only 10 characters allowed for a House Number");
-            alert.showAndWait();
-            tfDHouseNumber.requestFocus();
+            popUpAlert("House Number Too Long", "Only 10 characters allowed for a House Number", tfDHouseNumber);
         }
-        //Check to see if House number is a number;
-        //acknowledge the max integer constraint
-        else if(isInteger(tfDHouseNumber.getText()) == false &&
-                !"".equals(tfDHouseNumber.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("House Number must be an integer");
-            alert.setContentText("Please enter a number for House Number\n"
+        //Check to see if House number is a number acknowledge the max integer constraint
+        else if(isInteger(tfDHouseNumber.getText()) == false && !"".equals(tfDHouseNumber.getText())){
+            popUpAlert("House Number must be an integer", "Please enter a number for House Number\n"
                     + "\n"
-                    + "House Number must be less than 2,147,483,648");
-            alert.showAndWait();
-            tfDHouseNumber.requestFocus();
+                    + "House Number must be less than 2,147,483,648", tfDHouseNumber);
         }
         //Check to see if Street is less than 50 characters
         else if (tfDStreet.getText().length()> 50){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Street Too Long");
-            alert.setContentText("Only 50 characters allowed for a Street");
-            alert.showAndWait();
-            tfDStreet.requestFocus();
+            popUpAlert("Street Too Long", "Only 50 characters allowed for a Street", tfDStreet);
         }
         //Check to see if City or County is less than 40 characters
         else if (tfDCityCounty.getText().length()> 40){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("City / County Too Long");
-            alert.setContentText("Only 40 characters allowed for a City or County");
-            alert.showAndWait();
-            tfDCityCounty.requestFocus();
+            popUpAlert("City / County Too Long", "Only 40 characters allowed for a City or County", tfDCityCounty);
         }
         //Check to see if ZipCode is more than 5 characters
         else if (tfDZipCode.getText().length()> 5){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Zip Code Too Long");
-            alert.setContentText("Only 5 characters allowed for a Zip Code");
-            alert.showAndWait();
-            tfDZipCode.requestFocus();
+            popUpAlert("Zip Code Too Long", "Only 5 characters allowed for a Zip Code", tfDZipCode);
         }
         //Check to see if ZipCode is less than 5 characters
         else if (!"".equals(tfDZipCode.getText()) &&
                 tfDZipCode.getText().length() < 5){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Zip Code Too Short");
-            alert.setContentText("Zip Code must have 5 characters");
-            alert.showAndWait();
-            tfDZipCode.requestFocus();
+            popUpAlert("Zip Code Too Short", "Zip Code must have 5 characters", tfDZipCode);
         }
         //Check to see if ZipCode is a number IF the field is not empty
         else if(isInteger(tfDZipCode.getText()) == false &&
                 !"".equals(tfDZipCode.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Zip Code must be an integer");
-            alert.setContentText("Please enter a number for Zip Code");
-            alert.showAndWait();
-            tfDZipCode.requestFocus();
+            popUpAlert("Zip Code must be an integer", "Please enter a number for Zip Code", tfDZipCode);
         }
         //Hire Date Validation
         else if (isDateValid(tfDHireDate.getText()) == false &&
                     !"".equals(tfDHireDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Not a Valid Hire Date");
-            alert.setContentText("Not a Real Date\n"
-                    + "Please write Hire Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDHireDate.requestFocus();
+            popUpAlert("Not a Valid Hire Date", "Not a Real Date\n"
+                    + "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
         }
         else if (tfDHireDate.getText().length() < 10 &&
                 !"".equals(tfDHireDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Hire Date Too Short");
-            alert.setContentText("Please write Hire Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDHireDate.requestFocus();
+            popUpAlert("Hire Date Too Short", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
         }
         else if (tfDHireDate.getText().length() > 10 &&
                 !"".equals(tfDHireDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Hire Date Too Long");
-            alert.setContentText("Please write Hire Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDHireDate.requestFocus();
+            popUpAlert("Hire Date Too Long", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
         }
         else if (!"".equals(tfDHireDate.getText()) &&
                 isInteger(tfDHireDate.getText().substring(0,2)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Hire Date written incorrectly");
-            alert.setContentText("Please write Hire Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDHireDate.requestFocus();
+            popUpAlert("Hire Date written incorrectly", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
         }
         else if (!"".equals(tfDHireDate.getText()) &&
                 isInteger(tfDHireDate.getText().substring(3,5)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Hire Date written incorrectly");
-            alert.setContentText("Please write Hire Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
+            popUpAlert("Hire Date written incorrectly", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
         }
         else if (!"".equals(tfDHireDate.getText()) &&
                 isInteger(tfDHireDate.getText().substring(6,10)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Hire Date written incorrectly");
-            alert.setContentText("Please write Hire Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDHireDate.requestFocus();
+            popUpAlert("Hire Date written incorrectly", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
         }
         //Check to make sure DateOfBirth is provided if HireDate is provided
         else if ("".equals(tfDDateOfBirth.getText()) &&
                 !"".equals(tfDHireDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver missing Date of Birth");
-            alert.setContentText("Driver can only be hired after turning 25 years old\n"
-                    + "Please adjust Date of Birth");
-            alert.showAndWait();
-            tfDDateOfBirth.requestFocus();
+            popUpAlert("Driver missing Date of Birth", "Driver can only be hired after turning 25 years old\n"
+                    + "Please adjust Date of Birth", tfDDateOfBirth);
         }
         //Check to make sure HireDate is after 25 years from DateOfBirth
         else if (!"".equals(tfDDateOfBirth.getText()) &&
                 !"".equals(tfDHireDate.getText()) &&
                 sdf.parse(tfDHireDate.getText()).before(
                 sdf.parse(twentyFiveAfterDOB))){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver hired before 25 years old");
-            alert.setContentText("Driver can only be hired after turning 25 years old\n"
-                    + "Please adjust Hire Date");
-            alert.showAndWait();
-            tfDHireDate.requestFocus();
+            popUpAlert("Driver hired before 25 years old", "Driver can only be hired after turning 25 years old\n"
+                    + "Please adjust Hire Date", tfDHireDate);
         }
         //Check to make sure HireDate is before 75 years from DateOfBirth
         else if (!"".equals(tfDDateOfBirth.getText()) &&
                 !"".equals(tfDHireDate.getText()) &&
                 sdf.parse(tfDHireDate.getText()).after(
                 sdf.parse(seventyFiveAfterDOB))){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver hired after 75 years old");
-            alert.setContentText("Driver can only be hired before turning 75 years old\n"
-                    + "Please adjust Hire Date");
-            alert.showAndWait();
-            tfDHireDate.requestFocus();
+            popUpAlert("Driver hired after 75 years old", "Driver can only be hired before turning 75 years old\n"
+                    + "Please adjust Hire Date", tfDHireDate);
         }
         //Check to see if Driver is Hired after today
-        /*
-        else if (!"".equals(tfDHireDate.getText()) &&
-                sdf.parse(tfDHireDate.getText()).after(
-                sdf.parse(currentDate))){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver Hired in the Future");
-            alert.setContentText("Driver can only be Hired today or before\n"
-                    + "Please adjust Termination Date");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+        else if (!"".equals(tfDHireDate.getText()) && sdf.parse(tfDHireDate.getText()).after(sdf.parse(currentDate))){
+            popUpAlert("Driver Hired in the Future", "Driver can only be Hired today or before\n"
+                    + "Please adjust Termination Date", tfDTerminationDate);
         }
-        */
         //Termination Date Validation
         else if ("".equals(tfDHireDate.getText()) &&
                 !"".equals(tfDTerminationDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("No Hire Date Written");
-            alert.setContentText("Please provide a Hire Date if providing a Termination Date");
-            alert.showAndWait();
-            tfDHireDate.requestFocus();
+            popUpAlert("No Hire Date Written", "Please provide a Hire Date if providing a Termination Date", tfDHireDate);
         }
         else if (isDateValid(tfDTerminationDate.getText()) == false &&
                 !"".equals(tfDTerminationDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Not a Valid Termination Date");
-            alert.setContentText("Not a Real Date\n"
-                    + "Please write Termination Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+            popUpAlert("Not a Valid Termination Date", "Not a Real Date\n"
+                    + "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
         }
         else if (tfDTerminationDate.getText().length() < 10 &&
                 !"".equals(tfDTerminationDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Termination Date Too Short");
-            alert.setContentText("Please write Termination Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+            popUpAlert("Termination Date Too Short", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
         }
         else if (tfDTerminationDate.getText().length() > 10 &&
                 !"".equals(tfDTerminationDate.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Termination Date Too Long");
-            alert.setContentText("Please write Termination Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+            popUpAlert("Termination Date Too Long", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
         }
         else if (!"".equals(tfDTerminationDate.getText()) &&
                 isInteger(tfDTerminationDate.getText().substring(0,2)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Termination Date written incorrectly");
-            alert.setContentText("Please write Termination Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+            popUpAlert("Termination Date written incorrectly", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
         }
         else if (!"".equals(tfDTerminationDate.getText()) &&
                 isInteger(tfDTerminationDate.getText().substring(3,5)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Termination Date written incorrectly");
-            alert.setContentText("Please write Termination Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+            popUpAlert("Termination Date written incorrectly", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
         }
         else if (!"".equals(tfDTerminationDate.getText()) &&
                 isInteger(tfDTerminationDate.getText().substring(6,10)) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Termination Date written incorrectly");
-            alert.setContentText("Please write Termination Date in a MM/DD/YYYY Format");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+            popUpAlert("Termination Date written incorrectly", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
         }
         //Check to see if Driver is Terminated after Hire Date
-        else if (!"".equals(tfDHireDate.getText()) &&
-                !"".equals(tfDTerminationDate.getText()) &&
-                sdf.parse(tfDHireDate.getText()).after(
-                sdf.parse(tfDTerminationDate.getText()))){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver Terminated Before Hire Date");
-            alert.setContentText("Driver can only be Terminated after being Hired\n"
-                    + "Please adjust Termination Date");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+        else if (!"".equals(tfDHireDate.getText()) &&!"".equals(tfDTerminationDate.getText()) &&
+                sdf.parse(tfDHireDate.getText()).after(sdf.parse(tfDTerminationDate.getText()))){
+            popUpAlert("Driver Terminated Before Hire Date", "Driver can only be Terminated after being Hired\n"
+                    + "Please adjust Termination Date", tfDTerminationDate);
         }
         //Check to see if Driver is Terminated before turning 75
-        else if (!"".equals(tfDTerminationDate.getText()) &&
-                sdf.parse(tfDTerminationDate.getText()).after(
+        else if (!"".equals(tfDTerminationDate.getText()) &&sdf.parse(tfDTerminationDate.getText()).after(
                 sdf.parse(seventyFiveAfterDOB))){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver Terminated after turning 75");
-            alert.setContentText("Max age allowed for employed Drivers is 74\n"
+            popUpAlert("Driver Terminated after turning 75", "Max age allowed for employed Drivers is 74\n"
                     + "Driver must be terminated before their 75th birthday\n"
                     + "\n"
-                    + "Please adjust Termination Date");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+                    + "Please adjust Termination Date", tfDTerminationDate);
         }
         //Check to see if Driver is Terminated before today
-        /*
-        else if (!"".equals(tfDTerminationDate.getText()) &&
-                sdf.parse(tfDTerminationDate.getText()).after(
+        else if (!"".equals(tfDTerminationDate.getText()) && sdf.parse(tfDTerminationDate.getText()).after(
                 sdf.parse(currentDate))){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver Terminated in the Future");
-            alert.setContentText("Driver can only be Terminated today or before\n"
-                    + "Please adjust Termination Date");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+            popUpAlert("Driver Terminated in the Future", "Driver can only be Terminated today or before\n"
+                    + "Please adjust Termination Date", tfDTerminationDate);
         }
-        */
         //Check to see if Driver is Terminated after hire date
-        else if (!"".equals(tfDTerminationDate.getText()) &&
-                sdf.parse(tfDTerminationDate.getText()).after(
+        else if (!"".equals(tfDTerminationDate.getText()) && sdf.parse(tfDTerminationDate.getText()).after(
                 sdf.parse(tfDHireDate.getText())) == false){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Driver Terminated before employment");
-            alert.setContentText("Driver must be employed for atleast one day\n"
-                    + "Please adjust Termination Date");
-            alert.showAndWait();
-            tfDTerminationDate.requestFocus();
+            popUpAlert("Driver Terminated before employment", "Driver must be employed for atleast one day\n"
+                    + "Please adjust Termination Date", tfDTerminationDate);
         }
         //Check to see if UpdatedBy is null
         else if("".equals(tfDUpdatedBy.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
-                alert.setHeaderText("No Ownership to Update Specified");
-                alert.setContentText("Please write your name in the \"Updated By\" box");
-                alert.showAndWait();
-                tfDUpdatedBy.requestFocus();
+                popUpAlert("No Ownership to Update Specified", "Please write your name in the \"Updated By\" box", tfDUpdatedBy);
         }
         //Check to see if UpdatedBy is less than 20 characters
         else if (tfDUpdatedBy.getText().length()> 20){
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setHeaderText("Updated By Too Long");
-            alert.setContentText("Only 20 characters allowed for an Updated By Ownership");
-            alert.showAndWait();
-            tfDUpdatedBy.requestFocus();
+            popUpAlert("Updated By Too Long", "Only 20 characters allowed for an Updated By Ownership", tfDUpdatedBy);
         }
         else{
             assignDriverValues();
@@ -1855,7 +1620,7 @@ public class Lab1 extends Application{
                 taDisplayData.setText(displayDriverAge + "Age: Not Specified");
             else taDisplayData.setText(displayDriverAge + "Age: " + driverAge);
         }
-    }
+    }                       //working on 8/7/17 1:30PM
     
     public boolean checkForSameDriverID(){
         //check database for exact match of driverid
@@ -1899,32 +1664,10 @@ public class Lab1 extends Application{
         return false;
     }
     
-    public void assignDriverValues(){
-        myDriver.setDriverID(Integer.parseInt(tfDriverID.getText()));
-        myDriver.setFirstName(tfDFirstName.getText());
-        myDriver.setMiddleInitial(tfDMI.getText());
-        myDriver.setLastName(tfDLastName.getText());
-        myDriver.setSalary(tfDSalary.getText());
-        myDriver.setDateOfBirth(tfDDateOfBirth.getText());
-        myDriver.setCDL(tfDCDL.getText());
-        myDriver.setCDLDate(tfDCDLDate.getText());
-        myDriver.setContractorID(cbDContractorID);
-        myDriver.setHouseNumber(tfDHouseNumber.getText());
-        myDriver.setStreet(tfDStreet.getText());
-        myDriver.setCityCounty(tfDCityCounty.getText());
-        myDriver.setStateAbb(cbDHomeState);
-        myDriver.setZipCode(tfDZipCode.getText());
-        myDriver.setCountryAbb(cbDCountry);
-        myDriver.setHireDate(tfDHireDate.getText());
-        myDriver.setTerminationDate(tfDTerminationDate.getText());
-        myDriver.setLastUpdatedBy(tfDUpdatedBy.getText());
-        myDriver.setLastUpdated(getCurrentDate());
-    }
-    
     public void commitEquipment(){
         //Check to see if EquipmentID is empty
         if ("".equals(tfEquipmentID.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Equipment ID can't be empty");
             alert.setContentText("Please enter an Equipment ID");
             alert.showAndWait();
@@ -1932,7 +1675,7 @@ public class Lab1 extends Application{
         }
         //Check to see if DriverID has already been used
         else if(checkForSameEquipmentID()){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Equipment ID must be unique");
             alert.setContentText("Please enter a drifferent Equipment ID");
             alert.showAndWait();
@@ -1940,7 +1683,7 @@ public class Lab1 extends Application{
         }
         //Check to see if DriverName is unique
         else if(checkForSameEquipmentVin()){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Vin Number must be unique");
             alert.setContentText("Please enter a drifferent Vin Number");
             alert.showAndWait();
@@ -1948,7 +1691,7 @@ public class Lab1 extends Application{
         }
         //Check to see if EquipmentID fits into an integer constraint
         else if (tfEquipmentID.getText().length()> 10){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Equipment ID Too Long");
             alert.setContentText("Only 10 characters allowed for a Equipment ID");
             alert.showAndWait();
@@ -1957,7 +1700,7 @@ public class Lab1 extends Application{
         //Check to see if EquipmentID is a number;
         //acknowledge the max integer constraint
         else if (isInteger(tfEquipmentID.getText()) == false){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Equipment ID must be an integer");
             alert.setContentText("Please enter an number for Equipment ID\n"
                     + "\n"
@@ -1967,7 +1710,7 @@ public class Lab1 extends Application{
         }
         //Check to see if EquipmentID is a positive number
         else if (Integer.parseInt(tfEquipmentID.getText()) < 0){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Equipment ID Negative");
             alert.setContentText("Equipment ID must be a positive number");
             alert.showAndWait();
@@ -1975,7 +1718,7 @@ public class Lab1 extends Application{
         }
         //Check to see if EquipmentID is empty
         else if ("".equals(tfEVin.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Vin Number can't be empty");
             alert.setContentText("Please enter an Vin Number");
             alert.showAndWait();
@@ -1983,7 +1726,7 @@ public class Lab1 extends Application{
         }
         //Check to see if VinNumber length is less than 20 characters
         else if (tfEVin.getText().length()> 40){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Vin Number Too Long");
             alert.setContentText("Only 40 characters allowed for a Vin Number");
             alert.showAndWait();
@@ -1991,7 +1734,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Make length is less than 35 characters
         else if (tfEMake.getText().length()> 35){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Make Too Long");
             alert.setContentText("Only 35 characters allowed for a Make of Equipment");
             alert.showAndWait();
@@ -1999,7 +1742,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Model length is less than 30 characters
         else if (tfEModel.getText().length()> 30){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Model Too Long");
             alert.setContentText("Only 30 characters allowed for a Make of Equipment");
             alert.showAndWait();
@@ -2007,7 +1750,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Driver is left blank
         else if(cbEDriverID.getValue() == null){
-            Alert alert = new Alert(AlertType.ERROR);
+            
                 alert.setHeaderText("No Drivier Specified");
                 alert.setContentText("Driver can't be left blank");
                 alert.showAndWait();
@@ -2015,7 +1758,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Equipment Year is more than 4 characters
         else if (tfEYear.getText().length()> 4){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Year Too Long");
             alert.setContentText("Only 4 characters allowed for a Year");
             alert.showAndWait();
@@ -2024,7 +1767,7 @@ public class Lab1 extends Application{
         //Check to see if Equipment Year is a number
         else if(!"".equals(tfEYear.getText()) &&
                 isInteger(tfEYear.getText()) == false){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Equipment Year must be an integer");
             alert.setContentText("Please enter a number for Equipment Year");
             alert.showAndWait();
@@ -2033,7 +1776,7 @@ public class Lab1 extends Application{
         //Check to see if Equipment Year is a Valid Year
         else if(!"".equals(tfEYear.getText()) &&
                 tfEYear.getText().length() < 4){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Year Too Short");
             alert.setContentText("Please enter a Year in a \"YYYY\" Format");
             alert.showAndWait();
@@ -2044,7 +1787,7 @@ public class Lab1 extends Application{
         //a year "early" just like cars (ex. in year 2017, 2018 equipment is possible
         else if(!"".equals(tfEYear.getText()) &&
                 Integer.parseInt(tfEYear.getText()) > currentYear + 1){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("This Model has not been released yet!");
             alert.setContentText("Please enter a Year older than " + (currentYear +1));
             alert.showAndWait();
@@ -2053,7 +1796,7 @@ public class Lab1 extends Application{
         //Check to see if PriceAcquired is a double IF the field is not empty
         else if(!"".equals(tfEPriceAcquired.getText()) &&
                 isDouble(tfEPriceAcquired.getText()) == false){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Price Acquired must be a double");
             alert.setContentText("Please enter a numeric amount for Price Acquired");
             alert.showAndWait();
@@ -2063,7 +1806,7 @@ public class Lab1 extends Application{
         else if(isDouble(tfEPriceAcquired.getText()) == true &&
                 !"".equals(tfEPriceAcquired.getText()) &&
                 Double.parseDouble(tfEPriceAcquired.getText()) < 0){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Price Acquired must be a positive value");
             alert.setContentText("Please enter a positive value for Price Acquired");
             alert.showAndWait();
@@ -2074,7 +1817,7 @@ public class Lab1 extends Application{
         else if (tfEPriceAcquired.getText().contains(".") == true &&
                     tfEPriceAcquired.getText().substring(tfEPriceAcquired.getText().indexOf("."),
                     tfEPriceAcquired.getText().length()).length() > 3){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Price Acquired has too many decimal places");
             alert.setContentText("Please reduce amount of decimal places for the Price Acquired");
             alert.showAndWait();
@@ -2084,7 +1827,7 @@ public class Lab1 extends Application{
         else if (tfEPriceAcquired.getText().contains(".") == true &&
                     tfEPriceAcquired.getText().substring(1,
                     tfEPriceAcquired.getText().indexOf(".")).length() > 6){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Price Acquired Too Long");
             alert.setContentText("Price Acquired must be less than $1,000,000.00");
             alert.showAndWait();
@@ -2093,23 +1836,23 @@ public class Lab1 extends Application{
         //Check to see if PriceAcquired is less than $1,000,000.00
         else if (tfEPriceAcquired.getText().contains(".") == false &&
                     tfEPriceAcquired.getText().length() > 6){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Price Acquired Too Long");
             alert.setContentText("Price Acquired must be less than $1,000,000.00");
             alert.showAndWait();
             tfEPriceAcquired.requestFocus();
         }
         //Check to see if LicenseNumber length is less than 10 characters
-        else if (tfELicenseNumber.getText().length()> 10){
-            Alert alert = new Alert(AlertType.ERROR);
+        else if (tfELicensePlateNumber.getText().length()> 10){
+            
             alert.setHeaderText("License Plate Too Long");
             alert.setContentText("Only 10 characters allowed for a License Plate Number");
             alert.showAndWait();
-            tfELicenseNumber.requestFocus();
+            tfELicensePlateNumber.requestFocus();
         }
         //Check to see if UpdatedBy is null
         else if("".equals(tfEUpdatedBy.getText())){
-            Alert alert = new Alert(AlertType.ERROR);
+            
                 alert.setHeaderText("No Ownership to Update Specified");
                 alert.setContentText("Please write your name in the \"Updated By\" box");
                 alert.showAndWait();
@@ -2117,7 +1860,7 @@ public class Lab1 extends Application{
         }
         //Check to see if UpdatedBy is less than 20 characters
         else if (tfEUpdatedBy.getText().length()> 20){
-            Alert alert = new Alert(AlertType.ERROR);
+            
             alert.setHeaderText("Updated By Too Long");
             alert.setContentText("Only 20 characters allowed for an Updated By Ownership");
             alert.showAndWait();
@@ -2163,44 +1906,6 @@ public class Lab1 extends Application{
             }
         }catch (SQLException e) {}
         return false;
-    }
-    
-    public void assignEquipmentValues(){
-        //Assign EquipmentID to myEquipment
-        myEquipment.setID(Integer.parseInt(tfEquipmentID.getText()));
-        //Assign VinNumber to myEquipment
-        myEquipment.setVinNumber(tfEVin.getText());
-        //Assign Make to myEquipment
-        if ("".equals(tfEMake.getText()))
-            myEquipment.setMake("NULL");
-        else myEquipment.setMake(tfEMake.getText());
-        //Assign Model to myEquipment
-        if ("".equals(tfEModel.getText()))
-            myEquipment.setModel("NULL");
-        else myEquipment.setModel(tfEModel.getText());
-        //Assign EquipmentYear to myEquipment
-        if ("".equals(tfEYear.getText()))
-            myEquipment.EquipmentYear = null;
-        else myEquipment.setEquipmentYear(Integer.parseInt(tfEYear.getText()));
-        //Assign PriceAcquired to myEquipment
-        if ("".equals(tfEPriceAcquired.getText()))
-            myEquipment.PriceAcquired = null;
-        else myEquipment.setPriceAcuired(Double.parseDouble(tfEPriceAcquired.getText()));
-        //Assign LicenseNumber to myEquipment
-        if ("".equals(tfELicenseNumber.getText()))
-            myEquipment.setLicenseNumber("NULL");
-        else myEquipment.setLicenseNumber(tfELicenseNumber.getText());
-        //Assign DriverID to myEquipment
-        myEquipment.setDriverID(Integer.parseInt(
-                cbEDriverID.getValue().toString().substring(0,
-                cbEDriverID.getValue().toString().indexOf(" "))));
-        //Assign UpdatedBy to myEquipment
-        if ("".equals(tfDUpdatedBy.getText()))
-            myEquipment.setLastUpdatedBy("NULL");
-        else myEquipment.setLastUpdatedBy(tfDUpdatedBy.getText());
-        //Assign LastUpdated to myEquipment
-        myEquipment.setLastUpdated(getCurrentDate());
-        
     }
     
     public static String getCurrentDate(){
