@@ -8,122 +8,116 @@ this academic work
 */
 
 public class Person {
-    private int PersonID, HouseNumber;
-    private String FirstName, LastName, MiddleInitial, Street, CityCounty, StateAbb,
-            CountryAbb, ZipCode, LastUpdatedBy, LastUpdated;
-    private Double Fee;
+    private int personID = 0, houseNumber;
+    private String firstName, lastName, middleInitial, street, cityCounty, stateAbb,
+            countryAbb, zipCode, lastUpdatedBy, lastUpdated;
     
     //Constructor
     public Person() {
         //Data Fields
-        FirstName = "";
-        LastName = "";
-        MiddleInitial = "";
-        HouseNumber = 0;
-        Street = "";
-        CityCounty = "";
-        StateAbb = "";
-        CountryAbb = "";
-        ZipCode = "";
-        LastUpdatedBy = "";
-        LastUpdated = "";
+        personID = ++personID;
+        firstName = "";
+        lastName = "";
+        middleInitial = "";
+        houseNumber = 0;
+        street = "";
+        cityCounty = "";
+        stateAbb = "";
+        countryAbb = "";
+        zipCode = "";
+        lastUpdatedBy = "";
+        lastUpdated = "";
     }
-    //Create Overload methods....
-    //Create Overload methods....
-    //Create Overload methods....
-    //Create Overload methods....
-    //Create Overload methods....?
     
     //Setter Methods
     public void setFirstName(String firstNamePassed){                   //Required - First Name
-        this.FirstName = firstNamePassed;
+        this.firstName = firstNamePassed;
     }
     public void setLastName(String lastNamePassed){                     //Required - Last Name
-        this.LastName = lastNamePassed;
+        this.lastName = lastNamePassed;
     }
     public void setMiddleInitial(String middleInitialPassed){
         if (middleInitialPassed.equals(""))
-            this.MiddleInitial = "NULL";
-        else this.MiddleInitial = middleInitialPassed;
+            this.middleInitial = "NULL";
+        else this.middleInitial = middleInitialPassed;
     }
     public void setHouseNumber (String houseNumberPassed){
         if (houseNumberPassed.equals(""))
-            this.HouseNumber = 0;                                       //assign 0 if textbox empty
-        else this.HouseNumber = Integer.parseInt(houseNumberPassed);    //assign int
+            this.houseNumber = 0;                                       //assign 0 if textbox empty
+        else this.houseNumber = Integer.parseInt(houseNumberPassed);    //assign int
     }
     public void setStreet(String streetPassed){
         if (streetPassed.equals(""))
-            this.Street = "NULL";
-        else this.Street = streetPassed;
+            this.street = "NULL";
+        else this.street = streetPassed;
     }
     public void setCityCounty(String cityCountyPassed){
         if (cityCountyPassed.equals(""))
-            this.CityCounty = "NULL";
-        else this.CityCounty = cityCountyPassed;
+            this.cityCounty = "NULL";
+        else this.cityCounty = cityCountyPassed;
     }
     public void setStateAbb(Object stateAbbPassed){
         try{
-            this.StateAbb = stateAbbPassed.toString();                  //assign abbrevation to person
+            this.stateAbb = stateAbbPassed.toString();                  //assign abbrevation to person
         }catch (NullPointerException npe){
-            this.StateAbb = "NULL";                                     //assign NULL if empty
+            this.stateAbb = "NULL";                                     //assign NULL if empty
         }
     }
     public void setCountryAbb(Object countryAbbPassed){
         try{
-            this.CountryAbb = countryAbbPassed.toString();              //assign abbrevation to person
+            this.countryAbb = countryAbbPassed.toString();              //assign abbrevation to person
         }catch (NullPointerException npe){
-            this.CountryAbb = "NULL";                                   //assign NULL if empty
+            this.countryAbb = "NULL";                                   //assign NULL if empty
         }
     }
     public void setZipCode(String zipCodePassed){
         if (zipCodePassed.equals(""))
-            this.ZipCode = "NULL";
-        else this.ZipCode = zipCodePassed;
+            this.zipCode = "NULL";
+        else this.zipCode = zipCodePassed;
     }
     public void setLastUpdatedBy(String lastUpdatedByPassed){
         if (lastUpdatedByPassed.equals(""))
-            this.LastUpdatedBy = "NULL";
-        else this.LastUpdatedBy = lastUpdatedByPassed;
+            this.lastUpdatedBy = "NULL";
+        else this.lastUpdatedBy = lastUpdatedByPassed;
     }
     public void setLastUpdated(String lastUpdatedPassed){
         if (lastUpdatedPassed.equals(""))
-            this.LastUpdated = "NULL";
-        else this.LastUpdated = lastUpdatedPassed;
+            this.lastUpdated = "NULL";
+        else this.lastUpdated = lastUpdatedPassed;
     }
     
     //Getter Methods
     public String getFirstName(){
-        return this.FirstName;
+        return this.firstName;
     }
     public String getLastName(){
-        return this.LastName;
+        return this.lastName;
     }
     public String getMiddleInitial(){
-        return this.MiddleInitial;
+        return this.middleInitial;
     }
     public Integer getHouseNumber(){
-        return this.HouseNumber;
+        return this.houseNumber;
     }
     public String getStreet(){
-        return this.Street;
+        return this.street;
     }
     public String getCityCounty(){
-        return this.CityCounty;
+        return this.cityCounty;
     }
     public String getStateAbb(){
-        return this.StateAbb;
+        return this.stateAbb;
     }
     public String getCountryAbb(){
-        return this.CountryAbb;
+        return this.countryAbb;
     }
     public String getZipCode(){
-        return this.ZipCode;
+        return this.zipCode;
     }
     public String getLastUpdatedBy(){
-        return this.LastUpdatedBy;
+        return this.lastUpdatedBy;
     }
     public String getLastUpdated(){
-        return this.LastUpdated;
+        return this.lastUpdated;
     }
-    
 }
