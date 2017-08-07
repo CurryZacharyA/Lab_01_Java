@@ -241,31 +241,31 @@ public class Lab1 extends Application{
         });
         btnCCommit.setOnAction(e ->{
             taDisplayData.setText("");
-            commitContractor();
+            commitButtonContractor();
             layout.setCenter(createDGridPane());
             tfDriverID.requestFocus();
         });
         btnCCommit.setOnKeyPressed(e ->{
             taDisplayData.setText("");
-            commitContractor();
+            commitButtonContractor();
             layout.setCenter(createDGridPane());
             tfDriverID.requestFocus();
         });
         btnDCommit.setOnAction(e ->{
             try {
-                commitDriver();
+                commitButtonDriver();
             } catch (ParseException ex) {}
         });
         btnDCommit.setOnKeyPressed(e ->{
             try {
-                commitDriver();
+                commitButtonDriver();
             } catch (ParseException ex) {}
         });
         btnECommit.setOnAction(e ->{
-            commitEquipment();
+            commitButtonEquipment();
         });
         btnECommit.setOnKeyPressed(e ->{
-            commitEquipment();
+            commitButtonEquipment();
         });
         btnDisplayTotalFees.setOnAction(e ->{
             taDisplayData.setText("");
@@ -754,6 +754,570 @@ public class Lab1 extends Application{
         myDriver.setLastUpdated(getCurrentDate());
     }                       //looks good 8/7/17 12:50PM
     
+    public void commitButtonContractor(){
+        //Check first location in contractor array
+        if (arrayContractor[0] == null){
+            popUpAlert("Contractor Array Empty", "Please insert a contractor before Committing", tfContractorID);
+        }
+        else{
+            //Delete current Equipment, DriverContractor, Driver, and Contractor Tables
+            sendDBCommand("DELETE FROM EQUIPMENT");
+            sendDBCommand("DELETE FROM DRIVERCONTRACTOR");
+            sendDBCommand("DELETE FROM DRIVER");
+            sendDBCommand("DELETE FROM CONTRACTOR");
+            //For every object in Contractor array, add to Contractor Table in database
+            for (int i=0; i<arrayContractor.length;i++){
+                if (arrayContractor[i] != null){
+                    try{
+                       insertContractorValuesIntoDB(i);
+                    }catch (NullPointerException npe){}
+                }
+            }
+            driverContractorList.clear();
+            equipmentDriverList.clear();
+        }
+    }
+    
+    public void commitButtonDriver() throws ParseException{
+        if ("".equals(tfDDateOfBirth.getText())){}
+        else if (checkDateOfBirth() == false){
+            //Populate the date 25 years past DOB
+            Date dateDOB = sdf.parse(tfDDateOfBirth.getText());
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(dateDOB);
+            cal.add(Calendar.YEAR, 25);
+            Date dateTwentyFiveAfterDOB = cal.getTime();
+            twentyFiveAfterDOB = sdf.format(dateTwentyFiveAfterDOB);
+            //Populate the date 75 years past DOB
+            cal.setTime(dateDOB);
+            cal.add(Calendar.YEAR, 75);
+            cal.add(Calendar.DATE, -1);
+            Date dateSeventyFiveAfterDOB = cal.getTime();
+            seventyFiveAfterDOB = sdf.format(dateSeventyFiveAfterDOB);
+            //find drivers age
+            cal.setTime(sdf.parse(getCurrentDate()));
+            Integer dateDOBYear = Integer.parseInt(tfDDateOfBirth.getText().substring(6, 10));
+            Integer dateDOBMonth = Integer.parseInt(tfDDateOfBirth.getText().substring(0, 2));
+            Integer dateDOBDay = Integer.parseInt(tfDDateOfBirth.getText().substring(3, 5));
+            cal.add(Calendar.YEAR, -dateDOBYear);
+            cal.add(Calendar.MONTH, -dateDOBMonth);
+            cal.add(Calendar.DATE, -dateDOBDay);
+            
+            Date dateAge = cal.getTime();
+            String strAge = sdf.format(dateAge);
+            String lessAge = strAge.substring(6, 10);
+            driverAge = Integer.parseInt(lessAge);
+        }
+
+        //Check to see if DriverID is empty
+        if ("".equals(tfDriverID.getText())){
+            popUpAlert("Driver ID can't be empty", "Please enter a Driver ID", tfDriverID);
+        }
+        //Check to see if DriverID has already been used
+        else if(checkForSameDriverID()){
+            popUpAlert("Driver ID must be unique", "Please enter a drifferent Driver ID", tfDriverID);
+        }
+        //Check to see if DriverName is unique
+        else if(checkForSameDriverName()){
+            popUpAlert("Driver Name must be unique", "Driver Name already exists", tfDFirstName);
+        }
+        //Check to see if DriverID fits into an integer constraint
+        else if (tfDriverID.getText().length()> 10){
+            popUpAlert("Driver ID Too Long", "Only 10 characters allowed for a Driver ID", tfDriverID);
+        }
+        //Check to see if DriverID is a number acknowledge the max integer constraint
+        else if (isInteger(tfDriverID.getText()) == false){
+            popUpAlert("Driver ID must be an integer", "Please enter an number for Driver ID\n"
+                    + "\n"
+                    + "Contractor ID must be less than 2,147,483,648", tfDriverID);
+        }
+        //Check to see if DriverID is a positive number
+        else if (Integer.parseInt(tfDriverID.getText()) < 0){
+            popUpAlert("Driver ID Negative", "Driver ID must be a positive number", tfDriverID);
+        }
+        //Check to see if FirstName is left blank
+        else if("".equals(tfDFirstName.getText())){
+            popUpAlert("No First Name Specified", "First Name can't be left blank", tfDFirstName);
+        }
+        //Check to see if FirstName length is less than 20
+        else if (tfDFirstName.getText().length()> 20){
+            popUpAlert("First Name Too Long", "Only 20 characters allowed for a First Name", tfDFirstName);
+        }
+        //Check to see if MI is only 1 character
+        else if (tfDMI.getText().length()> 1){
+            popUpAlert("Middle Initial Too Long", "Only 1 character allowed for a Middle Initial", tfDMI);
+        }
+        //Check to see if LastName is left blank
+        else if("".equals(tfDLastName.getText())){
+            popUpAlert("No Last Name Specified", "Last Name can't be left blank", tfDLastName);
+        }
+        //Check to see if LastName is less than 20
+        else if (tfDLastName.getText().length()> 20){
+            popUpAlert("Last Name Too Long", "Only 20 characters allowed for a Last Name", tfDLastName);
+        }
+        //Check to see if Salary is a double IF the field is not empty
+        else if(isDouble(tfDSalary.getText()) == false && !"".equals(tfDSalary.getText())){
+            popUpAlert("Salary must be a double", "Please enter a numeric amount for Salary", tfDSalary);
+        }
+        //Check to see if Salary is a positive number
+        else if(isDouble(tfDSalary.getText()) == true && !"".equals(tfDSalary.getText()) &&
+                Double.parseDouble(tfDSalary.getText()) < 0){
+            popUpAlert("Salary must be a positive value", "Please enter a positive value for Salary", tfDSalary);
+        }
+        //Check to see if Salary field contains a decimal point AND IF SO
+        //...check to make sure it only contains 2 decimal places or less
+        else if (tfDSalary.getText().contains(".") == true &&
+                    tfDSalary.getText().substring(tfDSalary.getText().indexOf("."),
+                    tfDSalary.getText().length()).length() > 3){
+            popUpAlert("Salary has too many decimal places", "Please reduce amount of decimal places for the Salary", tfDSalary);
+        }
+        //Check to see if Salary falls within Decimal (10,2) constraints
+        else if (tfDSalary.getText().contains(".") == true && tfDSalary.getText().substring(1,
+                    tfDSalary.getText().indexOf(".")).length() > 8){
+            popUpAlert("Salary Too Long", "Salary must be less than $100,000,000.00", tfDSalary);
+        }
+        //Check to see if Salary is less than $10,000,000,000.00
+        else if (tfDSalary.getText().contains(".") == false &&
+                    tfDSalary.getText().length() > 8){
+            popUpAlert("Salary Too Long", "Salary must be less than $100,000,000.00", tfDSalary);
+        }
+        //Check to see if DOB is empty
+        else if ("".equals(tfDDateOfBirth.getText())){
+            popUpAlert("Date of Birth can't be empty", "Please enter a Date of Birth", tfDriverID);
+        }
+        //Date of Birth validations
+        else if (isDateValid(tfDDateOfBirth.getText()) == false &&
+                    !"".equals(tfDDateOfBirth.getText())){
+            popUpAlert("Not a Valid Date of Birth", "Not a Real Date\n"
+                    + "Please write a Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
+        }
+        else if (tfDDateOfBirth.getText().length() < 10 &&
+                !"".equals(tfDDateOfBirth.getText())){
+            popUpAlert("Date of Birth Too Short", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
+        }
+        else if (tfDDateOfBirth.getText().length() > 10 &&
+                !"".equals(tfDDateOfBirth.getText())){
+            popUpAlert("Date of Birth Too Long", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
+        }
+        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(0,2)) == false){
+            popUpAlert("Date of Birth written incorrectly", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
+        }
+        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(3,5)) == false){
+            popUpAlert("Date of Birth written incorrectly", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
+        }
+        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(6,10)) == false){
+            popUpAlert("Date of Birth written incorrectly", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
+        }
+        //Check to see if Driver is atleast 25 years old
+        else if (!"".equals(tfDDateOfBirth.getText()) && sdf.parse(tfDDateOfBirth.getText()).after(sdf.parse(tooYoung))){
+            popUpAlert("Driver is Too Young!", "Driver must be at least 25 years old", tfDDateOfBirth);
+        }
+        //Check to see if Driver is younger than 75 years old
+        else if (!"".equals(tfDDateOfBirth.getText()) && sdf.parse(tfDDateOfBirth.getText()).before(sdf.parse(tooOld))){
+            popUpAlert("Driver is Too Old!", "Driver must be younger than 75 years old", tfDDateOfBirth);
+        }
+        //Check to see if CDL is less than 40 characters
+        else if (tfDCDL.getText().length()> 40){
+            popUpAlert("CDL ID Too Long", "Only 40 characters allowed for a CDL ID", tfDCDL);
+        }
+        //CDL Experation Date Validation
+        else if (isDateValid(tfDCDLDate.getText()) == false && !"".equals(tfDCDLDate.getText())){
+            popUpAlert("Not a Valid CDL Experation Date", "Not a Real Date\n"
+                    + "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
+        }
+        else if (tfDCDLDate.getText().length() < 10 && !"".equals(tfDCDLDate.getText())){
+            popUpAlert("CDL Experation Date Too Short", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
+        }
+        else if (tfDCDLDate.getText().length() > 10 && !"".equals(tfDCDLDate.getText())){
+            popUpAlert("CDL Experation Date Too Long", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
+        }
+        else if (!"".equals(tfDCDLDate.getText()) && isInteger(tfDCDLDate.getText().substring(0,2)) == false){
+            popUpAlert("CDL Experation Date written incorrectly", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
+        }
+        else if (!"".equals(tfDCDLDate.getText()) && isInteger(tfDCDLDate.getText().substring(3,5)) == false){
+            popUpAlert("CDL Experation Date written incorrectly", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
+        }
+        else if (!"".equals(tfDCDLDate.getText()) &&isInteger(tfDCDLDate.getText().substring(6,10)) == false){
+            popUpAlert("CDL Experation Date written incorrectly", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
+        }
+        //Make sure CDL is not expired
+        else if (!"".equals(tfDCDLDate.getText()) && sdf.parse(tfDCDLDate.getText()).before(sdf.parse(currentDate))){
+            popUpAlert("CDL is Expired", "Driver must have a Non-Expired CDL", tfDCDLDate);
+        }
+        //Check to see if Contractor is left blank
+        else if(cbDContractorID.getValue() == null){
+            popUpAlert("No Contractor Specified", "Contractor can't be left blank", cbDContractorID);
+        }
+        //Check to see if House Number fits into an integer constraint
+        else if (tfDHouseNumber.getText().length()> 10){
+            popUpAlert("House Number Too Long", "Only 10 characters allowed for a House Number", tfDHouseNumber);
+        }
+        //Check to see if House number is a number acknowledge the max integer constraint
+        else if(isInteger(tfDHouseNumber.getText()) == false && !"".equals(tfDHouseNumber.getText())){
+            popUpAlert("House Number must be an integer", "Please enter a number for House Number\n"
+                    + "\n"
+                    + "House Number must be less than 2,147,483,648", tfDHouseNumber);
+        }
+        //Check to see if Street is less than 50 characters
+        else if (tfDStreet.getText().length()> 50){
+            popUpAlert("Street Too Long", "Only 50 characters allowed for a Street", tfDStreet);
+        }
+        //Check to see if City or County is less than 40 characters
+        else if (tfDCityCounty.getText().length()> 40){
+            popUpAlert("City / County Too Long", "Only 40 characters allowed for a City or County", tfDCityCounty);
+        }
+        //Check to see if ZipCode is more than 5 characters
+        else if (tfDZipCode.getText().length()> 5){
+            popUpAlert("Zip Code Too Long", "Only 5 characters allowed for a Zip Code", tfDZipCode);
+        }
+        //Check to see if ZipCode is less than 5 characters
+        else if (!"".equals(tfDZipCode.getText()) &&
+                tfDZipCode.getText().length() < 5){
+            popUpAlert("Zip Code Too Short", "Zip Code must have 5 characters", tfDZipCode);
+        }
+        //Check to see if ZipCode is a number IF the field is not empty
+        else if(isInteger(tfDZipCode.getText()) == false &&
+                !"".equals(tfDZipCode.getText())){
+            popUpAlert("Zip Code must be an integer", "Please enter a number for Zip Code", tfDZipCode);
+        }
+        //Hire Date Validation
+        else if (isDateValid(tfDHireDate.getText()) == false &&
+                    !"".equals(tfDHireDate.getText())){
+            popUpAlert("Not a Valid Hire Date", "Not a Real Date\n"
+                    + "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
+        }
+        else if (tfDHireDate.getText().length() < 10 &&
+                !"".equals(tfDHireDate.getText())){
+            popUpAlert("Hire Date Too Short", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
+        }
+        else if (tfDHireDate.getText().length() > 10 &&
+                !"".equals(tfDHireDate.getText())){
+            popUpAlert("Hire Date Too Long", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
+        }
+        else if (!"".equals(tfDHireDate.getText()) &&
+                isInteger(tfDHireDate.getText().substring(0,2)) == false){
+            popUpAlert("Hire Date written incorrectly", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
+        }
+        else if (!"".equals(tfDHireDate.getText()) &&
+                isInteger(tfDHireDate.getText().substring(3,5)) == false){
+            popUpAlert("Hire Date written incorrectly", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
+        }
+        else if (!"".equals(tfDHireDate.getText()) &&
+                isInteger(tfDHireDate.getText().substring(6,10)) == false){
+            popUpAlert("Hire Date written incorrectly", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
+        }
+        //Check to make sure DateOfBirth is provided if HireDate is provided
+        else if ("".equals(tfDDateOfBirth.getText()) &&
+                !"".equals(tfDHireDate.getText())){
+            popUpAlert("Driver missing Date of Birth", "Driver can only be hired after turning 25 years old\n"
+                    + "Please adjust Date of Birth", tfDDateOfBirth);
+        }
+        //Check to make sure HireDate is after 25 years from DateOfBirth
+        else if (!"".equals(tfDDateOfBirth.getText()) && !"".equals(tfDHireDate.getText()) &&
+                sdf.parse(tfDHireDate.getText()).before(sdf.parse(twentyFiveAfterDOB))){
+            popUpAlert("Driver hired before 25 years old", "Driver can only be hired after turning 25 years old\n"
+                    + "Please adjust Hire Date", tfDHireDate);
+        }
+        //Check to make sure HireDate is before 75 years from DateOfBirth
+        else if (!"".equals(tfDDateOfBirth.getText()) && !"".equals(tfDHireDate.getText()) &&
+                sdf.parse(tfDHireDate.getText()).after(sdf.parse(seventyFiveAfterDOB))){
+            popUpAlert("Driver hired after 75 years old", "Driver can only be hired before turning 75 years old\n"
+                    + "Please adjust Hire Date", tfDHireDate);
+        }
+        //Check to see if Driver is Hired after today
+        else if (!"".equals(tfDHireDate.getText()) && sdf.parse(tfDHireDate.getText()).after(sdf.parse(currentDate))){
+            popUpAlert("Driver Hired in the Future", "Driver can only be Hired today or before\n"
+                    + "Please adjust Termination Date", tfDTerminationDate);
+        }
+        //Termination Date Validation
+        else if ("".equals(tfDHireDate.getText()) &&
+                !"".equals(tfDTerminationDate.getText())){
+            popUpAlert("No Hire Date Written", "Please provide a Hire Date if providing a Termination Date", tfDHireDate);
+        }
+        else if (isDateValid(tfDTerminationDate.getText()) == false &&
+                !"".equals(tfDTerminationDate.getText())){
+            popUpAlert("Not a Valid Termination Date", "Not a Real Date\n"
+                    + "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
+        }
+        else if (tfDTerminationDate.getText().length() < 10 &&
+                !"".equals(tfDTerminationDate.getText())){
+            popUpAlert("Termination Date Too Short", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
+        }
+        else if (tfDTerminationDate.getText().length() > 10 &&
+                !"".equals(tfDTerminationDate.getText())){
+            popUpAlert("Termination Date Too Long", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
+        }
+        else if (!"".equals(tfDTerminationDate.getText()) &&
+                isInteger(tfDTerminationDate.getText().substring(0,2)) == false){
+            popUpAlert("Termination Date written incorrectly", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
+        }
+        else if (!"".equals(tfDTerminationDate.getText()) &&
+                isInteger(tfDTerminationDate.getText().substring(3,5)) == false){
+            popUpAlert("Termination Date written incorrectly", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
+        }
+        else if (!"".equals(tfDTerminationDate.getText()) &&
+                isInteger(tfDTerminationDate.getText().substring(6,10)) == false){
+            popUpAlert("Termination Date written incorrectly", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
+        }
+        //Check to see if Driver is Terminated after Hire Date
+        else if (!"".equals(tfDHireDate.getText()) &&!"".equals(tfDTerminationDate.getText()) &&
+                sdf.parse(tfDHireDate.getText()).after(sdf.parse(tfDTerminationDate.getText()))){
+            popUpAlert("Driver Terminated Before Hire Date", "Driver can only be Terminated after being Hired\n"
+                    + "Please adjust Termination Date", tfDTerminationDate);
+        }
+        //Check to see if Driver is Terminated before turning 75
+        else if (!"".equals(tfDTerminationDate.getText()) &&sdf.parse(tfDTerminationDate.getText()).after(
+                sdf.parse(seventyFiveAfterDOB))){
+            popUpAlert("Driver Terminated after turning 75", "Max age allowed for employed Drivers is 74\n"
+                    + "Driver must be terminated before their 75th birthday\n"
+                    + "\n"
+                    + "Please adjust Termination Date", tfDTerminationDate);
+        }
+        //Check to see if Driver is Terminated before today
+        else if (!"".equals(tfDTerminationDate.getText()) && sdf.parse(tfDTerminationDate.getText()).after(
+                sdf.parse(currentDate))){
+            popUpAlert("Driver Terminated in the Future", "Driver can only be Terminated today or before\n"
+                    + "Please adjust Termination Date", tfDTerminationDate);
+        }
+        //Check to see if Driver is Terminated after hire date
+        else if (!"".equals(tfDTerminationDate.getText()) && sdf.parse(tfDTerminationDate.getText()).after(
+                sdf.parse(tfDHireDate.getText())) == false){
+            popUpAlert("Driver Terminated before employment", "Driver must be employed for atleast one day\n"
+                    + "Please adjust Termination Date", tfDTerminationDate);
+        }
+        //Check to see if UpdatedBy is null
+        else if("".equals(tfDUpdatedBy.getText())){
+                popUpAlert("No Ownership to Update Specified", "Please write your name in the \"Updated By\" box", tfDUpdatedBy);
+        }
+        //Check to see if UpdatedBy is less than 20 characters
+        else if (tfDUpdatedBy.getText().length()> 20){
+            popUpAlert("Updated By Too Long", "Only 20 characters allowed for an Updated By Ownership", tfDUpdatedBy);
+        }
+        else{
+            assignDriverValues();
+            insertDriverValuesIntoDB();
+            tfDriverID.requestFocus();
+            equipmentDriverList.clear();
+            //populate bottom textarea with current driver's age
+            String displayDriverAge = tfDFirstName.getText();
+            if (tfDMI.getText() != null)
+                displayDriverAge += " " + tfDMI.getText();
+            displayDriverAge += " " + tfDLastName.getText() + "'s ";
+            if ("".equals(tfDDateOfBirth.getText()))
+                taDisplayData.setText(displayDriverAge + "Age: Not Specified");
+            else taDisplayData.setText(displayDriverAge + "Age: " + driverAge);
+        }
+    }                       //working on 8/7/17 1:30PM
+    
+    public void commitButtonEquipment(){
+        //Check to see if EquipmentID is empty
+        if ("".equals(tfEquipmentID.getText())){
+            
+            alert.setHeaderText("Equipment ID can't be empty");
+            alert.setContentText("Please enter an Equipment ID");
+            alert.showAndWait();
+            tfEquipmentID.requestFocus();
+        }
+        //Check to see if DriverID has already been used
+        else if(checkForSameEquipmentID()){
+            
+            alert.setHeaderText("Equipment ID must be unique");
+            alert.setContentText("Please enter a drifferent Equipment ID");
+            alert.showAndWait();
+            tfEquipmentID.requestFocus();
+        }
+        //Check to see if DriverName is unique
+        else if(checkForSameEquipmentVin()){
+            
+            alert.setHeaderText("Vin Number must be unique");
+            alert.setContentText("Please enter a drifferent Vin Number");
+            alert.showAndWait();
+            tfEVin.requestFocus();
+        }
+        //Check to see if EquipmentID fits into an integer constraint
+        else if (tfEquipmentID.getText().length()> 10){
+            
+            alert.setHeaderText("Equipment ID Too Long");
+            alert.setContentText("Only 10 characters allowed for a Equipment ID");
+            alert.showAndWait();
+            tfEquipmentID.requestFocus();
+        }
+        //Check to see if EquipmentID is a number;
+        //acknowledge the max integer constraint
+        else if (isInteger(tfEquipmentID.getText()) == false){
+            
+            alert.setHeaderText("Equipment ID must be an integer");
+            alert.setContentText("Please enter an number for Equipment ID\n"
+                    + "\n"
+                    + "Contractor ID must be less than 2,147,483,648");
+            alert.showAndWait();
+            tfEquipmentID.requestFocus();
+        }
+        //Check to see if EquipmentID is a positive number
+        else if (Integer.parseInt(tfEquipmentID.getText()) < 0){
+            
+            alert.setHeaderText("Equipment ID Negative");
+            alert.setContentText("Equipment ID must be a positive number");
+            alert.showAndWait();
+            tfEquipmentID.requestFocus();
+        }
+        //Check to see if EquipmentID is empty
+        else if ("".equals(tfEVin.getText())){
+            
+            alert.setHeaderText("Vin Number can't be empty");
+            alert.setContentText("Please enter an Vin Number");
+            alert.showAndWait();
+            tfEVin.requestFocus();
+        }
+        //Check to see if VinNumber length is less than 20 characters
+        else if (tfEVin.getText().length()> 40){
+            
+            alert.setHeaderText("Vin Number Too Long");
+            alert.setContentText("Only 40 characters allowed for a Vin Number");
+            alert.showAndWait();
+            tfEVin.requestFocus();
+        }
+        //Check to see if Make length is less than 35 characters
+        else if (tfEMake.getText().length()> 35){
+            
+            alert.setHeaderText("Make Too Long");
+            alert.setContentText("Only 35 characters allowed for a Make of Equipment");
+            alert.showAndWait();
+            tfEMake.requestFocus();
+        }
+        //Check to see if Model length is less than 30 characters
+        else if (tfEModel.getText().length()> 30){
+            
+            alert.setHeaderText("Model Too Long");
+            alert.setContentText("Only 30 characters allowed for a Make of Equipment");
+            alert.showAndWait();
+            tfEModel.requestFocus();
+        }
+        //Check to see if Driver is left blank
+        else if(cbEDriverID.getValue() == null){
+            
+                alert.setHeaderText("No Drivier Specified");
+                alert.setContentText("Driver can't be left blank");
+                alert.showAndWait();
+                cbEDriverID.requestFocus();
+        }
+        //Check to see if Equipment Year is more than 4 characters
+        else if (tfEYear.getText().length()> 4){
+            
+            alert.setHeaderText("Year Too Long");
+            alert.setContentText("Only 4 characters allowed for a Year");
+            alert.showAndWait();
+            tfEYear.requestFocus();
+        }
+        //Check to see if Equipment Year is a number
+        else if(!"".equals(tfEYear.getText()) &&
+                isInteger(tfEYear.getText()) == false){
+            
+            alert.setHeaderText("Equipment Year must be an integer");
+            alert.setContentText("Please enter a number for Equipment Year");
+            alert.showAndWait();
+            tfEYear.requestFocus();
+        }
+        //Check to see if Equipment Year is a Valid Year
+        else if(!"".equals(tfEYear.getText()) &&
+                tfEYear.getText().length() < 4){
+            
+            alert.setHeaderText("Year Too Short");
+            alert.setContentText("Please enter a Year in a \"YYYY\" Format");
+            alert.showAndWait();
+            tfEYear.requestFocus();
+        }
+        //Check to see if Equipment Year is from the past and not newer than the
+        //present Year+1 ...Adding 1 to Year because I assume Equipment is released
+        //a year "early" just like cars (ex. in year 2017, 2018 equipment is possible
+        else if(!"".equals(tfEYear.getText()) &&
+                Integer.parseInt(tfEYear.getText()) > currentYear + 1){
+            
+            alert.setHeaderText("This Model has not been released yet!");
+            alert.setContentText("Please enter a Year older than " + (currentYear +1));
+            alert.showAndWait();
+            tfEYear.requestFocus();
+        }
+        //Check to see if PriceAcquired is a double IF the field is not empty
+        else if(!"".equals(tfEPriceAcquired.getText()) &&
+                isDouble(tfEPriceAcquired.getText()) == false){
+            
+            alert.setHeaderText("Price Acquired must be a double");
+            alert.setContentText("Please enter a numeric amount for Price Acquired");
+            alert.showAndWait();
+            tfEPriceAcquired.requestFocus();
+        }
+        //Check to see if PriceAcquired is a positive number
+        else if(isDouble(tfEPriceAcquired.getText()) == true &&
+                !"".equals(tfEPriceAcquired.getText()) &&
+                Double.parseDouble(tfEPriceAcquired.getText()) < 0){
+            
+            alert.setHeaderText("Price Acquired must be a positive value");
+            alert.setContentText("Please enter a positive value for Price Acquired");
+            alert.showAndWait();
+            tfEPriceAcquired.requestFocus();
+        }
+        //Check to see if PriceAcquired field contains a decimal point AND IF SO
+        //...check to make sure it only contains 2 decimal places or less
+        else if (tfEPriceAcquired.getText().contains(".") == true &&
+                    tfEPriceAcquired.getText().substring(tfEPriceAcquired.getText().indexOf("."),
+                    tfEPriceAcquired.getText().length()).length() > 3){
+            
+            alert.setHeaderText("Price Acquired has too many decimal places");
+            alert.setContentText("Please reduce amount of decimal places for the Price Acquired");
+            alert.showAndWait();
+            tfEPriceAcquired.requestFocus();
+        }
+        //Check to see if PriceAcquired falls within Decimal (8 ,2) constraints
+        else if (tfEPriceAcquired.getText().contains(".") == true &&
+                    tfEPriceAcquired.getText().substring(1,
+                    tfEPriceAcquired.getText().indexOf(".")).length() > 6){
+            
+            alert.setHeaderText("Price Acquired Too Long");
+            alert.setContentText("Price Acquired must be less than $1,000,000.00");
+            alert.showAndWait();
+            tfEPriceAcquired.requestFocus();
+        }
+        //Check to see if PriceAcquired is less than $1,000,000.00
+        else if (tfEPriceAcquired.getText().contains(".") == false &&
+                    tfEPriceAcquired.getText().length() > 6){
+            
+            alert.setHeaderText("Price Acquired Too Long");
+            alert.setContentText("Price Acquired must be less than $1,000,000.00");
+            alert.showAndWait();
+            tfEPriceAcquired.requestFocus();
+        }
+        //Check to see if LicenseNumber length is less than 10 characters
+        else if (tfELicensePlateNumber.getText().length()> 10){
+            
+            alert.setHeaderText("License Plate Too Long");
+            alert.setContentText("Only 10 characters allowed for a License Plate Number");
+            alert.showAndWait();
+            tfELicensePlateNumber.requestFocus();
+        }
+        //Check to see if UpdatedBy is null
+        else if("".equals(tfEUpdatedBy.getText())){
+            
+                alert.setHeaderText("No Ownership to Update Specified");
+                alert.setContentText("Please write your name in the \"Updated By\" box");
+                alert.showAndWait();
+                tfEUpdatedBy.requestFocus();
+        }
+        //Check to see if UpdatedBy is less than 20 characters
+        else if (tfEUpdatedBy.getText().length()> 20){
+            
+            alert.setHeaderText("Updated By Too Long");
+            alert.setContentText("Only 20 characters allowed for an Updated By Ownership");
+            alert.showAndWait();
+            tfEUpdatedBy.requestFocus();
+        }
+        else{
+            assignEquipmentValues();
+            insertEquipmentValuesIntoDB();
+            tfEquipmentID.requestFocus();
+        }
+    }
+    
     //NEED TO WORK ON THIS!!!
     public void insertContractorValuesIntoDB(int i){
         //Set up Contractor Array Values into SQL language
@@ -934,41 +1498,6 @@ public class Lab1 extends Application{
                 + "FROM DRIVER", equipmentDriverList);
         olDriverID = FXCollections.observableArrayList(equipmentDriverList);
     }                                               //looks good
-    
-    public void commitContractor(){
-        //Check first location in contractor array
-        if (arrayContractor[0] == null){
-            
-            alert.setHeaderText("Contractor Array Empty");
-            alert.setContentText("Please insert a contractor before Committing");
-            alert.showAndWait();
-            tfContractorID.requestFocus();
-        }
-        else{
-            //Delete current Equipment Table
-            sqlQuery = "DELETE FROM EQUIPMENT";
-            sendDBCommand(sqlQuery);
-            //Delete current DriverContractor Table
-            sqlQuery = "DELETE FROM DRIVERCONTRACTOR";
-            sendDBCommand(sqlQuery);
-            //Delete current Driver Table
-            sqlQuery = "DELETE FROM DRIVER";
-            sendDBCommand(sqlQuery);
-            //Delete current Contractor Table
-            sqlQuery = "DELETE FROM CONTRACTOR";
-            sendDBCommand(sqlQuery);
-            //For every object in Contractor array, add to Contractor Table in database
-            for (int i=0; i<arrayContractor.length;i++){
-                if (arrayContractor[i] != null){
-                    try{
-                       insertContractorValuesIntoDB(i);
-                    }catch (NullPointerException npe){}
-                }
-            }
-            driverContractorList.clear();
-            equipmentDriverList.clear();
-        }
-    }
     
     public void insertButtonContractor(){
         //Check to see if ContractorID Field Empty
@@ -1286,342 +1815,6 @@ public class Lab1 extends Application{
         focusRequest.requestFocus();
     }
     
-    public void commitDriver() throws ParseException{
-        if ("".equals(tfDDateOfBirth.getText())){}
-        else if (checkDateOfBirth() == false){
-            //Populate the date 25 years past DOB
-            Date dateDOB = sdf.parse(tfDDateOfBirth.getText());
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(dateDOB);
-            cal.add(Calendar.YEAR, 25);
-            Date dateTwentyFiveAfterDOB = cal.getTime();
-            twentyFiveAfterDOB = sdf.format(dateTwentyFiveAfterDOB);
-            //Populate the date 75 years past DOB
-            cal.setTime(dateDOB);
-            cal.add(Calendar.YEAR, 75);
-            cal.add(Calendar.DATE, -1);
-            Date dateSeventyFiveAfterDOB = cal.getTime();
-            seventyFiveAfterDOB = sdf.format(dateSeventyFiveAfterDOB);
-            //find drivers age
-            cal.setTime(sdf.parse(getCurrentDate()));
-            Integer dateDOBYear = Integer.parseInt(tfDDateOfBirth.getText().substring(6, 10));
-            Integer dateDOBMonth = Integer.parseInt(tfDDateOfBirth.getText().substring(0, 2));
-            Integer dateDOBDay = Integer.parseInt(tfDDateOfBirth.getText().substring(3, 5));
-            cal.add(Calendar.YEAR, -dateDOBYear);
-            cal.add(Calendar.MONTH, -dateDOBMonth);
-            cal.add(Calendar.DATE, -dateDOBDay);
-            
-            Date dateAge = cal.getTime();
-            String strAge = sdf.format(dateAge);
-            String lessAge = strAge.substring(6, 10);
-            driverAge = Integer.parseInt(lessAge);
-        }
-
-        //Check to see if DriverID is empty
-        if ("".equals(tfDriverID.getText())){
-            popUpAlert("Driver ID can't be empty", "Please enter a Driver ID", tfDriverID);
-        }
-        //Check to see if DriverID has already been used
-        else if(checkForSameDriverID()){
-            popUpAlert("Driver ID must be unique", "Please enter a drifferent Driver ID", tfDriverID);
-        }
-        //Check to see if DriverName is unique
-        else if(checkForSameDriverName()){
-            popUpAlert("Driver Name must be unique", "Driver Name already exists", tfDFirstName);
-        }
-        //Check to see if DriverID fits into an integer constraint
-        else if (tfDriverID.getText().length()> 10){
-            popUpAlert("Driver ID Too Long", "Only 10 characters allowed for a Driver ID", tfDriverID);
-        }
-        //Check to see if DriverID is a number;
-        //acknowledge the max integer constraint
-        else if (isInteger(tfDriverID.getText()) == false){
-            popUpAlert("Driver ID must be an integer", "Please enter an number for Driver ID\n"
-                    + "\n"
-                    + "Contractor ID must be less than 2,147,483,648", tfDriverID);
-        }
-        //Check to see if DriverID is a positive number
-        else if (Integer.parseInt(tfDriverID.getText()) < 0){
-            popUpAlert("Driver ID Negative", "Driver ID must be a positive number", tfDriverID);
-        }
-        //Check to see if FirstName is left blank
-        else if("".equals(tfDFirstName.getText())){
-            popUpAlert("No First Name Specified", "First Name can't be left blank", tfDFirstName);
-        }
-        //Check to see if FirstName length is less than 20
-        else if (tfDFirstName.getText().length()> 20){
-            popUpAlert("First Name Too Long", "Only 20 characters allowed for a First Name", tfDFirstName);
-        }
-        //Check to see if MI is only 1 character
-        else if (tfDMI.getText().length()> 1){
-            popUpAlert("Middle Initial Too Long", "Only 1 character allowed for a Middle Initial", tfDMI);
-        }
-        //Check to see if LastName is left blank
-        else if("".equals(tfDLastName.getText())){
-            popUpAlert("No Last Name Specified", "Last Name can't be left blank", tfDLastName);
-        }
-        //Check to see if LastName is less than 20
-        else if (tfDLastName.getText().length()> 20){
-            popUpAlert("Last Name Too Long", "Only 20 characters allowed for a Last Name", tfDLastName);
-        }
-        //Check to see if Salary is a double IF the field is not empty
-        else if(isDouble(tfDSalary.getText()) == false && !"".equals(tfDSalary.getText())){
-            popUpAlert("Salary must be a double", "Please enter a numeric amount for Salary", tfDSalary);
-        }
-        //Check to see if Salary is a positive number
-        else if(isDouble(tfDSalary.getText()) == true && !"".equals(tfDSalary.getText()) &&
-                Double.parseDouble(tfDSalary.getText()) < 0){
-            popUpAlert("Salary must be a positive value", "Please enter a positive value for Salary", tfDSalary);
-        }
-        //Check to see if Salary field contains a decimal point AND IF SO
-        //...check to make sure it only contains 2 decimal places or less
-        else if (tfDSalary.getText().contains(".") == true &&
-                    tfDSalary.getText().substring(tfDSalary.getText().indexOf("."),
-                    tfDSalary.getText().length()).length() > 3){
-            popUpAlert("Salary has too many decimal places", "Please reduce amount of decimal places for the Salary", tfDSalary);
-        }
-        //Check to see if Salary falls within Decimal (10,2) constraints
-        else if (tfDSalary.getText().contains(".") == true && tfDSalary.getText().substring(1,
-                    tfDSalary.getText().indexOf(".")).length() > 8){
-            popUpAlert("Salary Too Long", "Salary must be less than $100,000,000.00", tfDSalary);
-        }
-        //Check to see if Salary is less than $10,000,000,000.00
-        else if (tfDSalary.getText().contains(".") == false &&
-                    tfDSalary.getText().length() > 8){
-            popUpAlert("Salary Too Long", "Salary must be less than $100,000,000.00", tfDSalary);
-        }
-        //Check to see if DOB is empty
-        else if ("".equals(tfDDateOfBirth.getText())){
-            popUpAlert("Date of Birth can't be empty", "Please enter a Date of Birth", tfDriverID);
-        }
-        //Date of Birth validations
-        else if (isDateValid(tfDDateOfBirth.getText()) == false &&
-                    !"".equals(tfDDateOfBirth.getText())){
-            popUpAlert("Not a Valid Date of Birth", "Not a Real Date\n"
-                    + "Please write a Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
-        }
-        else if (tfDDateOfBirth.getText().length() < 10 &&
-                !"".equals(tfDDateOfBirth.getText())){
-            popUpAlert("Date of Birth Too Short", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
-        }
-        else if (tfDDateOfBirth.getText().length() > 10 &&
-                !"".equals(tfDDateOfBirth.getText())){
-            popUpAlert("Date of Birth Too Long", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
-        }
-        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(0,2)) == false){
-            popUpAlert("Date of Birth written incorrectly", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
-        }
-        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(3,5)) == false){
-            popUpAlert("Date of Birth written incorrectly", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
-        }
-        else if (!"".equals(tfDDateOfBirth.getText()) && isInteger(tfDDateOfBirth.getText().substring(6,10)) == false){
-            popUpAlert("Date of Birth written incorrectly", "Please write Date of Birth in a MM/DD/YYYY Format", tfDDateOfBirth);
-        }
-        //Check to see if Driver is atleast 25 years old
-        else if (!"".equals(tfDDateOfBirth.getText()) && sdf.parse(tfDDateOfBirth.getText()).after(sdf.parse(tooYoung))){
-            popUpAlert("Driver is Too Young!", "Driver must be at least 25 years old", tfDDateOfBirth);
-        }
-        //Check to see if Driver is younger than 75 years old
-        else if (!"".equals(tfDDateOfBirth.getText()) && sdf.parse(tfDDateOfBirth.getText()).before(sdf.parse(tooOld))){
-            popUpAlert("Driver is Too Old!", "Driver must be younger than 75 years old", tfDDateOfBirth);
-        }
-        //Check to see if CDL is less than 40 characters
-        else if (tfDCDL.getText().length()> 40){
-            popUpAlert("CDL ID Too Long", "Only 40 characters allowed for a CDL ID", tfDCDL);
-        }
-        //CDL Experation Date Validation
-        else if (isDateValid(tfDCDLDate.getText()) == false && !"".equals(tfDCDLDate.getText())){
-            popUpAlert("Not a Valid CDL Experation Date", "Not a Real Date\n"
-                    + "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
-        }
-        else if (tfDCDLDate.getText().length() < 10 && !"".equals(tfDCDLDate.getText())){
-            popUpAlert("CDL Experation Date Too Short", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
-        }
-        else if (tfDCDLDate.getText().length() > 10 && !"".equals(tfDCDLDate.getText())){
-            popUpAlert("CDL Experation Date Too Long", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
-        }
-        else if (!"".equals(tfDCDLDate.getText()) && isInteger(tfDCDLDate.getText().substring(0,2)) == false){
-            popUpAlert("CDL Experation Date written incorrectly", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
-        }
-        else if (!"".equals(tfDCDLDate.getText()) && isInteger(tfDCDLDate.getText().substring(3,5)) == false){
-            popUpAlert("CDL Experation Date written incorrectly", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
-        }
-        else if (!"".equals(tfDCDLDate.getText()) &&isInteger(tfDCDLDate.getText().substring(6,10)) == false){
-            popUpAlert("CDL Experation Date written incorrectly", "Please write CDL Experation Date in a MM/DD/YYYY Format", tfDCDLDate);
-        }
-        //Make sure CDL is not expired
-        else if (!"".equals(tfDCDLDate.getText()) && sdf.parse(tfDCDLDate.getText()).before(sdf.parse(currentDate))){
-            popUpAlert("CDL is Expired", "Driver must have a Non-Expired CDL", tfDCDLDate);
-        }
-        //Check to see if Contractor is left blank
-        else if(cbDContractorID.getValue() == null){
-            popUpAlert("No Contractor Specified", "Contractor can't be left blank", cbDContractorID);
-        }
-        //Check to see if House Number fits into an integer constraint
-        else if (tfDHouseNumber.getText().length()> 10){
-            popUpAlert("House Number Too Long", "Only 10 characters allowed for a House Number", tfDHouseNumber);
-        }
-        //Check to see if House number is a number acknowledge the max integer constraint
-        else if(isInteger(tfDHouseNumber.getText()) == false && !"".equals(tfDHouseNumber.getText())){
-            popUpAlert("House Number must be an integer", "Please enter a number for House Number\n"
-                    + "\n"
-                    + "House Number must be less than 2,147,483,648", tfDHouseNumber);
-        }
-        //Check to see if Street is less than 50 characters
-        else if (tfDStreet.getText().length()> 50){
-            popUpAlert("Street Too Long", "Only 50 characters allowed for a Street", tfDStreet);
-        }
-        //Check to see if City or County is less than 40 characters
-        else if (tfDCityCounty.getText().length()> 40){
-            popUpAlert("City / County Too Long", "Only 40 characters allowed for a City or County", tfDCityCounty);
-        }
-        //Check to see if ZipCode is more than 5 characters
-        else if (tfDZipCode.getText().length()> 5){
-            popUpAlert("Zip Code Too Long", "Only 5 characters allowed for a Zip Code", tfDZipCode);
-        }
-        //Check to see if ZipCode is less than 5 characters
-        else if (!"".equals(tfDZipCode.getText()) &&
-                tfDZipCode.getText().length() < 5){
-            popUpAlert("Zip Code Too Short", "Zip Code must have 5 characters", tfDZipCode);
-        }
-        //Check to see if ZipCode is a number IF the field is not empty
-        else if(isInteger(tfDZipCode.getText()) == false &&
-                !"".equals(tfDZipCode.getText())){
-            popUpAlert("Zip Code must be an integer", "Please enter a number for Zip Code", tfDZipCode);
-        }
-        //Hire Date Validation
-        else if (isDateValid(tfDHireDate.getText()) == false &&
-                    !"".equals(tfDHireDate.getText())){
-            popUpAlert("Not a Valid Hire Date", "Not a Real Date\n"
-                    + "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
-        }
-        else if (tfDHireDate.getText().length() < 10 &&
-                !"".equals(tfDHireDate.getText())){
-            popUpAlert("Hire Date Too Short", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
-        }
-        else if (tfDHireDate.getText().length() > 10 &&
-                !"".equals(tfDHireDate.getText())){
-            popUpAlert("Hire Date Too Long", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
-        }
-        else if (!"".equals(tfDHireDate.getText()) &&
-                isInteger(tfDHireDate.getText().substring(0,2)) == false){
-            popUpAlert("Hire Date written incorrectly", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
-        }
-        else if (!"".equals(tfDHireDate.getText()) &&
-                isInteger(tfDHireDate.getText().substring(3,5)) == false){
-            popUpAlert("Hire Date written incorrectly", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
-        }
-        else if (!"".equals(tfDHireDate.getText()) &&
-                isInteger(tfDHireDate.getText().substring(6,10)) == false){
-            popUpAlert("Hire Date written incorrectly", "Please write Hire Date in a MM/DD/YYYY Format", tfDHireDate);
-        }
-        //Check to make sure DateOfBirth is provided if HireDate is provided
-        else if ("".equals(tfDDateOfBirth.getText()) &&
-                !"".equals(tfDHireDate.getText())){
-            popUpAlert("Driver missing Date of Birth", "Driver can only be hired after turning 25 years old\n"
-                    + "Please adjust Date of Birth", tfDDateOfBirth);
-        }
-        //Check to make sure HireDate is after 25 years from DateOfBirth
-        else if (!"".equals(tfDDateOfBirth.getText()) &&
-                !"".equals(tfDHireDate.getText()) &&
-                sdf.parse(tfDHireDate.getText()).before(
-                sdf.parse(twentyFiveAfterDOB))){
-            popUpAlert("Driver hired before 25 years old", "Driver can only be hired after turning 25 years old\n"
-                    + "Please adjust Hire Date", tfDHireDate);
-        }
-        //Check to make sure HireDate is before 75 years from DateOfBirth
-        else if (!"".equals(tfDDateOfBirth.getText()) &&
-                !"".equals(tfDHireDate.getText()) &&
-                sdf.parse(tfDHireDate.getText()).after(
-                sdf.parse(seventyFiveAfterDOB))){
-            popUpAlert("Driver hired after 75 years old", "Driver can only be hired before turning 75 years old\n"
-                    + "Please adjust Hire Date", tfDHireDate);
-        }
-        //Check to see if Driver is Hired after today
-        else if (!"".equals(tfDHireDate.getText()) && sdf.parse(tfDHireDate.getText()).after(sdf.parse(currentDate))){
-            popUpAlert("Driver Hired in the Future", "Driver can only be Hired today or before\n"
-                    + "Please adjust Termination Date", tfDTerminationDate);
-        }
-        //Termination Date Validation
-        else if ("".equals(tfDHireDate.getText()) &&
-                !"".equals(tfDTerminationDate.getText())){
-            popUpAlert("No Hire Date Written", "Please provide a Hire Date if providing a Termination Date", tfDHireDate);
-        }
-        else if (isDateValid(tfDTerminationDate.getText()) == false &&
-                !"".equals(tfDTerminationDate.getText())){
-            popUpAlert("Not a Valid Termination Date", "Not a Real Date\n"
-                    + "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
-        }
-        else if (tfDTerminationDate.getText().length() < 10 &&
-                !"".equals(tfDTerminationDate.getText())){
-            popUpAlert("Termination Date Too Short", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
-        }
-        else if (tfDTerminationDate.getText().length() > 10 &&
-                !"".equals(tfDTerminationDate.getText())){
-            popUpAlert("Termination Date Too Long", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
-        }
-        else if (!"".equals(tfDTerminationDate.getText()) &&
-                isInteger(tfDTerminationDate.getText().substring(0,2)) == false){
-            popUpAlert("Termination Date written incorrectly", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
-        }
-        else if (!"".equals(tfDTerminationDate.getText()) &&
-                isInteger(tfDTerminationDate.getText().substring(3,5)) == false){
-            popUpAlert("Termination Date written incorrectly", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
-        }
-        else if (!"".equals(tfDTerminationDate.getText()) &&
-                isInteger(tfDTerminationDate.getText().substring(6,10)) == false){
-            popUpAlert("Termination Date written incorrectly", "Please write Termination Date in a MM/DD/YYYY Format", tfDTerminationDate);
-        }
-        //Check to see if Driver is Terminated after Hire Date
-        else if (!"".equals(tfDHireDate.getText()) &&!"".equals(tfDTerminationDate.getText()) &&
-                sdf.parse(tfDHireDate.getText()).after(sdf.parse(tfDTerminationDate.getText()))){
-            popUpAlert("Driver Terminated Before Hire Date", "Driver can only be Terminated after being Hired\n"
-                    + "Please adjust Termination Date", tfDTerminationDate);
-        }
-        //Check to see if Driver is Terminated before turning 75
-        else if (!"".equals(tfDTerminationDate.getText()) &&sdf.parse(tfDTerminationDate.getText()).after(
-                sdf.parse(seventyFiveAfterDOB))){
-            popUpAlert("Driver Terminated after turning 75", "Max age allowed for employed Drivers is 74\n"
-                    + "Driver must be terminated before their 75th birthday\n"
-                    + "\n"
-                    + "Please adjust Termination Date", tfDTerminationDate);
-        }
-        //Check to see if Driver is Terminated before today
-        else if (!"".equals(tfDTerminationDate.getText()) && sdf.parse(tfDTerminationDate.getText()).after(
-                sdf.parse(currentDate))){
-            popUpAlert("Driver Terminated in the Future", "Driver can only be Terminated today or before\n"
-                    + "Please adjust Termination Date", tfDTerminationDate);
-        }
-        //Check to see if Driver is Terminated after hire date
-        else if (!"".equals(tfDTerminationDate.getText()) && sdf.parse(tfDTerminationDate.getText()).after(
-                sdf.parse(tfDHireDate.getText())) == false){
-            popUpAlert("Driver Terminated before employment", "Driver must be employed for atleast one day\n"
-                    + "Please adjust Termination Date", tfDTerminationDate);
-        }
-        //Check to see if UpdatedBy is null
-        else if("".equals(tfDUpdatedBy.getText())){
-                popUpAlert("No Ownership to Update Specified", "Please write your name in the \"Updated By\" box", tfDUpdatedBy);
-        }
-        //Check to see if UpdatedBy is less than 20 characters
-        else if (tfDUpdatedBy.getText().length()> 20){
-            popUpAlert("Updated By Too Long", "Only 20 characters allowed for an Updated By Ownership", tfDUpdatedBy);
-        }
-        else{
-            assignDriverValues();
-            insertDriverValuesIntoDB();
-            tfDriverID.requestFocus();
-            equipmentDriverList.clear();
-            //populate bottom textarea with current driver's age
-            String displayDriverAge = tfDFirstName.getText();
-            if (tfDMI.getText() != null)
-                displayDriverAge += " " + tfDMI.getText();
-            displayDriverAge += " " + tfDLastName.getText() + "'s ";
-            if ("".equals(tfDDateOfBirth.getText()))
-                taDisplayData.setText(displayDriverAge + "Age: Not Specified");
-            else taDisplayData.setText(displayDriverAge + "Age: " + driverAge);
-        }
-    }                       //working on 8/7/17 1:30PM
-    
     public boolean checkForSameDriverID(){
         //check database for exact match of driverid
         try{
@@ -1662,215 +1855,6 @@ public class Lab1 extends Application{
             }
         }catch (SQLException e) {}
         return false;
-    }
-    
-    public void commitEquipment(){
-        //Check to see if EquipmentID is empty
-        if ("".equals(tfEquipmentID.getText())){
-            
-            alert.setHeaderText("Equipment ID can't be empty");
-            alert.setContentText("Please enter an Equipment ID");
-            alert.showAndWait();
-            tfEquipmentID.requestFocus();
-        }
-        //Check to see if DriverID has already been used
-        else if(checkForSameEquipmentID()){
-            
-            alert.setHeaderText("Equipment ID must be unique");
-            alert.setContentText("Please enter a drifferent Equipment ID");
-            alert.showAndWait();
-            tfEquipmentID.requestFocus();
-        }
-        //Check to see if DriverName is unique
-        else if(checkForSameEquipmentVin()){
-            
-            alert.setHeaderText("Vin Number must be unique");
-            alert.setContentText("Please enter a drifferent Vin Number");
-            alert.showAndWait();
-            tfEVin.requestFocus();
-        }
-        //Check to see if EquipmentID fits into an integer constraint
-        else if (tfEquipmentID.getText().length()> 10){
-            
-            alert.setHeaderText("Equipment ID Too Long");
-            alert.setContentText("Only 10 characters allowed for a Equipment ID");
-            alert.showAndWait();
-            tfEquipmentID.requestFocus();
-        }
-        //Check to see if EquipmentID is a number;
-        //acknowledge the max integer constraint
-        else if (isInteger(tfEquipmentID.getText()) == false){
-            
-            alert.setHeaderText("Equipment ID must be an integer");
-            alert.setContentText("Please enter an number for Equipment ID\n"
-                    + "\n"
-                    + "Contractor ID must be less than 2,147,483,648");
-            alert.showAndWait();
-            tfEquipmentID.requestFocus();
-        }
-        //Check to see if EquipmentID is a positive number
-        else if (Integer.parseInt(tfEquipmentID.getText()) < 0){
-            
-            alert.setHeaderText("Equipment ID Negative");
-            alert.setContentText("Equipment ID must be a positive number");
-            alert.showAndWait();
-            tfEquipmentID.requestFocus();
-        }
-        //Check to see if EquipmentID is empty
-        else if ("".equals(tfEVin.getText())){
-            
-            alert.setHeaderText("Vin Number can't be empty");
-            alert.setContentText("Please enter an Vin Number");
-            alert.showAndWait();
-            tfEVin.requestFocus();
-        }
-        //Check to see if VinNumber length is less than 20 characters
-        else if (tfEVin.getText().length()> 40){
-            
-            alert.setHeaderText("Vin Number Too Long");
-            alert.setContentText("Only 40 characters allowed for a Vin Number");
-            alert.showAndWait();
-            tfEVin.requestFocus();
-        }
-        //Check to see if Make length is less than 35 characters
-        else if (tfEMake.getText().length()> 35){
-            
-            alert.setHeaderText("Make Too Long");
-            alert.setContentText("Only 35 characters allowed for a Make of Equipment");
-            alert.showAndWait();
-            tfEMake.requestFocus();
-        }
-        //Check to see if Model length is less than 30 characters
-        else if (tfEModel.getText().length()> 30){
-            
-            alert.setHeaderText("Model Too Long");
-            alert.setContentText("Only 30 characters allowed for a Make of Equipment");
-            alert.showAndWait();
-            tfEModel.requestFocus();
-        }
-        //Check to see if Driver is left blank
-        else if(cbEDriverID.getValue() == null){
-            
-                alert.setHeaderText("No Drivier Specified");
-                alert.setContentText("Driver can't be left blank");
-                alert.showAndWait();
-                cbEDriverID.requestFocus();
-        }
-        //Check to see if Equipment Year is more than 4 characters
-        else if (tfEYear.getText().length()> 4){
-            
-            alert.setHeaderText("Year Too Long");
-            alert.setContentText("Only 4 characters allowed for a Year");
-            alert.showAndWait();
-            tfEYear.requestFocus();
-        }
-        //Check to see if Equipment Year is a number
-        else if(!"".equals(tfEYear.getText()) &&
-                isInteger(tfEYear.getText()) == false){
-            
-            alert.setHeaderText("Equipment Year must be an integer");
-            alert.setContentText("Please enter a number for Equipment Year");
-            alert.showAndWait();
-            tfEYear.requestFocus();
-        }
-        //Check to see if Equipment Year is a Valid Year
-        else if(!"".equals(tfEYear.getText()) &&
-                tfEYear.getText().length() < 4){
-            
-            alert.setHeaderText("Year Too Short");
-            alert.setContentText("Please enter a Year in a \"YYYY\" Format");
-            alert.showAndWait();
-            tfEYear.requestFocus();
-        }
-        //Check to see if Equipment Year is from the past and not newer than the
-        //present Year+1 ...Adding 1 to Year because I assume Equipment is released
-        //a year "early" just like cars (ex. in year 2017, 2018 equipment is possible
-        else if(!"".equals(tfEYear.getText()) &&
-                Integer.parseInt(tfEYear.getText()) > currentYear + 1){
-            
-            alert.setHeaderText("This Model has not been released yet!");
-            alert.setContentText("Please enter a Year older than " + (currentYear +1));
-            alert.showAndWait();
-            tfEYear.requestFocus();
-        }
-        //Check to see if PriceAcquired is a double IF the field is not empty
-        else if(!"".equals(tfEPriceAcquired.getText()) &&
-                isDouble(tfEPriceAcquired.getText()) == false){
-            
-            alert.setHeaderText("Price Acquired must be a double");
-            alert.setContentText("Please enter a numeric amount for Price Acquired");
-            alert.showAndWait();
-            tfEPriceAcquired.requestFocus();
-        }
-        //Check to see if PriceAcquired is a positive number
-        else if(isDouble(tfEPriceAcquired.getText()) == true &&
-                !"".equals(tfEPriceAcquired.getText()) &&
-                Double.parseDouble(tfEPriceAcquired.getText()) < 0){
-            
-            alert.setHeaderText("Price Acquired must be a positive value");
-            alert.setContentText("Please enter a positive value for Price Acquired");
-            alert.showAndWait();
-            tfEPriceAcquired.requestFocus();
-        }
-        //Check to see if PriceAcquired field contains a decimal point AND IF SO
-        //...check to make sure it only contains 2 decimal places or less
-        else if (tfEPriceAcquired.getText().contains(".") == true &&
-                    tfEPriceAcquired.getText().substring(tfEPriceAcquired.getText().indexOf("."),
-                    tfEPriceAcquired.getText().length()).length() > 3){
-            
-            alert.setHeaderText("Price Acquired has too many decimal places");
-            alert.setContentText("Please reduce amount of decimal places for the Price Acquired");
-            alert.showAndWait();
-            tfEPriceAcquired.requestFocus();
-        }
-        //Check to see if PriceAcquired falls within Decimal (8 ,2) constraints
-        else if (tfEPriceAcquired.getText().contains(".") == true &&
-                    tfEPriceAcquired.getText().substring(1,
-                    tfEPriceAcquired.getText().indexOf(".")).length() > 6){
-            
-            alert.setHeaderText("Price Acquired Too Long");
-            alert.setContentText("Price Acquired must be less than $1,000,000.00");
-            alert.showAndWait();
-            tfEPriceAcquired.requestFocus();
-        }
-        //Check to see if PriceAcquired is less than $1,000,000.00
-        else if (tfEPriceAcquired.getText().contains(".") == false &&
-                    tfEPriceAcquired.getText().length() > 6){
-            
-            alert.setHeaderText("Price Acquired Too Long");
-            alert.setContentText("Price Acquired must be less than $1,000,000.00");
-            alert.showAndWait();
-            tfEPriceAcquired.requestFocus();
-        }
-        //Check to see if LicenseNumber length is less than 10 characters
-        else if (tfELicensePlateNumber.getText().length()> 10){
-            
-            alert.setHeaderText("License Plate Too Long");
-            alert.setContentText("Only 10 characters allowed for a License Plate Number");
-            alert.showAndWait();
-            tfELicensePlateNumber.requestFocus();
-        }
-        //Check to see if UpdatedBy is null
-        else if("".equals(tfEUpdatedBy.getText())){
-            
-                alert.setHeaderText("No Ownership to Update Specified");
-                alert.setContentText("Please write your name in the \"Updated By\" box");
-                alert.showAndWait();
-                tfEUpdatedBy.requestFocus();
-        }
-        //Check to see if UpdatedBy is less than 20 characters
-        else if (tfEUpdatedBy.getText().length()> 20){
-            
-            alert.setHeaderText("Updated By Too Long");
-            alert.setContentText("Only 20 characters allowed for an Updated By Ownership");
-            alert.showAndWait();
-            tfEUpdatedBy.requestFocus();
-        }
-        else{
-            assignEquipmentValues();
-            insertEquipmentValuesIntoDB();
-            tfEquipmentID.requestFocus();
-        }
     }
     
     public boolean checkForSameEquipmentID(){
