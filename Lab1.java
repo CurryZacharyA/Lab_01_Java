@@ -56,7 +56,7 @@ public class Lab1 extends Application{
     //Set Dates and Date Constraints
     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
     String currentDate = getCurrentDate();
-    Integer currentYear = Integer.parseInt(currentDate.substring(6,10));
+    int currentYear = Integer.parseInt(currentDate.substring(6,10));
     String tooOld;
     String tooYoung;
     String twentyFiveAfterDOB;
@@ -150,14 +150,10 @@ public class Lab1 extends Application{
     @Override
     public void start(Stage primaryStage){
         //Clear data that is not mine from the database
-        sqlQuery = "DELETE FROM DRIVERCONTRACTOR";
-        sendDBCommand(sqlQuery);
-        sqlQuery = "DELETE FROM EQUIPMENT";
-        sendDBCommand(sqlQuery);
-        sqlQuery = "DELETE FROM DRIVER";
-        sendDBCommand(sqlQuery);
-        sqlQuery = "DELETE FROM CONTRACTOR";
-        sendDBCommand(sqlQuery);
+        sendDBCommand("DELETE FROM DRIVERCONTRACTOR");
+        sendDBCommand("DELETE FROM EQUIPMENT");
+        sendDBCommand("DELETE FROM DRIVER");
+        sendDBCommand("DELETE FROM CONTRACTOR");
         //run methods that populate dropdowns on the program
         loadStatesDataFromDB();
         loadCountriesDataFromDB();
@@ -254,12 +250,16 @@ public class Lab1 extends Application{
         btnDCommit.setOnAction(e ->{
             try {
                 commitButtonDriver();
-            } catch (ParseException ex) {}
+            } catch (ParseException ex){
+                System.out.println(ex);
+            }
         });
         btnDCommit.setOnKeyPressed(e ->{
             try {
                 commitButtonDriver();
-            } catch (ParseException ex) {}
+            } catch (ParseException ex){
+                System.out.println(ex);
+            }
         });
         btnECommit.setOnAction(e ->{
             commitButtonEquipment();
@@ -298,15 +298,13 @@ public class Lab1 extends Application{
         String totalFees = null;
         try{
             //Count Contractors in the database
-            sqlQuery = "SELECT COUNT(CONTRACTORID) FROM CONTRACTOR";
-            sendDBCommand(sqlQuery);
+            sendDBCommand("SELECT COUNT(CONTRACTORID) FROM CONTRACTOR");
             //If atleast one contractor in database then continue
             while (dbResults.next()){
                 if (Integer.parseInt(dbResults.getString(1)) > 0){
                     try{                        
                         //Get the sum of all commited Contractor's fees
-                        sqlQuery = "SELECT SUM(FEE) FROM CONTRACTOR";
-                        sendDBCommand(sqlQuery);
+                        sendDBCommand("SELECT SUM(FEE) FROM CONTRACTOR");
                         while (dbResults.next()){
                             //Display Total Fees and format to Dollars
                             totalFees = "Total amount of Fees for all committed Contractors\n"
@@ -318,26 +316,22 @@ public class Lab1 extends Application{
                         taDisplayData.setText(totalFees);
                     }catch (NullPointerException npe){
                         //if no fees enter for any contractor, display
-                        
-                        alert.setHeaderText("No Contractor Fees entered into Database");
-                        alert.setContentText("Please commit atleast one Contractor Fee to the Database");
-                        alert.showAndWait();
                         layout.setCenter(createCGridPane());
-                        tfCFee.requestFocus();
+                        popUpAlert("No Contractor Fees entered into Database",
+                                "Please commit atleast one Contractor Fee to the Database", tfCFee);
+                        System.out.println(npe);
                         break;
                     }
                 }
                 else{
                     //if not contractors in database, display
-                    
-                    alert.setHeaderText("No Contractors in Database");
-                    alert.setContentText("Please commit atleast one Contractor to the Database");
-                    alert.showAndWait();
                     layout.setCenter(createCGridPane());
-                    tfContractorID.requestFocus();
+                    popUpAlert("No Contractors in Database", "Please commit atleast one Contractor to the Database", tfContractorID);
                 }
             }
-        }catch (SQLException e) {}
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
     }
     
     //FIND BETTER WAY
@@ -385,7 +379,9 @@ public class Lab1 extends Application{
             }
             //display string predetermined
             taDisplayData.setText(displayDE);
-        }catch (SQLException e) {}
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
     }
     
     public void assignContractorValues(){
@@ -462,7 +458,9 @@ public class Lab1 extends Application{
                 if (arrayContractor[i] != null){
                     try{
                        insertContractorValuesIntoDB(i);
-                    }catch (NullPointerException npe){}
+                    }catch (NullPointerException npe){
+                        System.out.println(npe);
+                    }
                 }
             }
             driverContractorList.clear();
@@ -1105,6 +1103,7 @@ public class Lab1 extends Application{
                 i++;
             }
         }catch (SQLException e) {
+            System.out.println(e);
         }
     }                //looks good
     
@@ -1120,7 +1119,9 @@ public class Lab1 extends Application{
                 nameConcatenated += " " + dbResults.getString(3);
                 localArrayList.add(nameConcatenated);
             }
-        }catch (SQLException e) {}
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
     }   //looks good
 
     public void loadStatesDataFromDB(){
@@ -1152,209 +1153,109 @@ public class Lab1 extends Application{
     public void insertButtonContractor(){
         //Check to see if ContractorID Field Empty
         if ("".equals(tfContractorID.getText())){
-            
-            alert.setHeaderText("Contractor ID can't be empty");
-            alert.setContentText("Please enter a Contractor ID");
-            alert.showAndWait();
-            tfContractorID.requestFocus();
+            popUpAlert("Contractor ID can't be empty", "Please enter a Contractor ID", tfContractorID);
         }
         //Check to see if ContractorID fits into an integer constraint
         else if (tfContractorID.getText().length() > 10){
-            
-            alert.setHeaderText("Contractor ID Too Long");
-            alert.setContentText("Only 10 characters allowed for a Contractor ID");
-            alert.showAndWait();
-            tfContractorID.requestFocus();
+            popUpAlert("Contractor ID Too Long", "Only 10 characters allowed for a Contractor ID", tfContractorID);
         }
         //Check to see if ContractorID is a number; acknowledge the max integer constraint
         else if (isInteger(tfContractorID.getText()) == false){
-            
-            alert.setHeaderText("Contractor ID must be an integer");
-            alert.setContentText("Please enter an number for Contractor ID\n"
+            popUpAlert("Contractor ID must be an integer", "Please enter an number for Contractor ID\n"
                     + "\n"
-                    + "Contractor ID must be less than 2,147,483,648");
-            alert.showAndWait();
-            tfContractorID.requestFocus();
+                    + "Contractor ID must be less than 2,147,483,648", tfContractorID);
         }
         //Check to see if ContractorID is a positive number
         else if (Integer.parseInt(tfContractorID.getText()) < 0){
-            
-            alert.setHeaderText("Contractor ID Negative");
-            alert.setContentText("Contractor ID must be a positive number");
-            alert.showAndWait();
-            tfContractorID.requestFocus();
+            popUpAlert("Contractor ID Negative", "Contractor ID must be a positive number", tfContractorID);
         }
         //Check to see if FirstName is left blank
         else if("".equals(tfCFirstName.getText())){
-            
-                alert.setHeaderText("No First Name Specified");
-                alert.setContentText("First Name can't be left blank");
-                alert.showAndWait();
-                tfCFirstName.requestFocus();
+            popUpAlert("No First Name Specified", "First Name can't be left blank", tfCFirstName);
         }
         //Check to see if FirstName length is less than 20
         else if (tfCFirstName.getText().length() > 20){
-            
-            alert.setHeaderText("First Name Too Long");
-            alert.setContentText("Only 20 characters allowed for a First Name");
-            alert.showAndWait();
-            tfCFirstName.requestFocus();
+            popUpAlert("First Name Too Long", "Only 20 characters allowed for a First Name", tfCFirstName);
         }
         //Check to see if MI is only 1 character
         else if (tfCMI.getText().length() > 1){
-            
-            alert.setHeaderText("Middle Initial Too Long");
-            alert.setContentText("Only 1 character allowed for a Middle Initial");
-            alert.showAndWait();
-            tfCMI.requestFocus();
+            popUpAlert("Middle Initial Too Long", "Only 1 character allowed for a Middle Initial", tfCMI);
         }
         //Check to see if LastName is left blank
         else if("".equals(tfCLastName.getText())){
-            
-                alert.setHeaderText("No Last Name Specified");
-                alert.setContentText("Last Name can't be left blank");
-                alert.showAndWait();
-                tfCLastName.requestFocus();
+            popUpAlert("No Last Name Specified", "Last Name can't be left blank", tfCLastName);
         }
         //Check to see if LastName is less than 20
         else if (tfCLastName.getText().length() > 20){
-            
-            alert.setHeaderText("Last Name Too Long");
-            alert.setContentText("Only 20 characters allowed for a Last Name");
-            alert.showAndWait();
-            tfCLastName.requestFocus();
+            popUpAlert("Last Name Too Long", "Only 20 characters allowed for a Last Name", tfCLastName);
         }
         //Check to see if Fee is a double IF the field is not empty
         else if(isDouble(tfCFee.getText()) == false && !"".equals(tfCFee.getText())){
-            
-            alert.setHeaderText("Fee must be a double");
-            alert.setContentText("Please enter a numeric amount for Fee");
-            alert.showAndWait();
-            tfCFee.requestFocus();
+            popUpAlert("Fee must be a double", "Please enter a numeric amount for Fee", tfCFee);
         }
         //Check to see if Fee is a positive number
-        else if(isDouble(tfCFee.getText()) == true &&
-                !"".equals(tfCFee.getText()) &&
+        else if(isDouble(tfCFee.getText()) == true && !"".equals(tfCFee.getText()) &&
                 Double.parseDouble(tfCFee.getText()) < 0){
-            
-            alert.setHeaderText("Fee must be a positive value");
-            alert.setContentText("Please enter a positive value for Fee");
-            alert.showAndWait();
-            tfCFee.requestFocus();
+            popUpAlert("Fee must be a positive value", "Please enter a positive value for Fee", tfCFee);
         }
         //Check to see if Fee field contains a decimal point AND IF SO
         //...check to make sure it only contains 2 decimal places or less
-        else if (tfCFee.getText().contains(".") == true &&
-                    tfCFee.getText().substring(tfCFee.getText().indexOf("."),
+        else if (tfCFee.getText().contains(".") == true && tfCFee.getText().substring(tfCFee.getText().indexOf("."),
                     tfCFee.getText().length()).length() > 3){
-            
-            alert.setHeaderText("Fee has too many decimal places");
-            alert.setContentText("Please reduce amount of decimal places for the Fee");
-            alert.showAndWait();
-            tfCFee.requestFocus();
+            popUpAlert("Fee has too many decimal places", "Please reduce amount of decimal places for the Fee", tfCFee);
         }
         //Check to see if Fee falls within Decimal (8,2) constraints
-        else if (tfCFee.getText().contains(".") == true &&
-                    tfCFee.getText().substring(1,
+        else if (tfCFee.getText().contains(".") == true && tfCFee.getText().substring(1,
                     tfCFee.getText().indexOf(".")).length() > 6){
-            
-            alert.setHeaderText("Fee Too Long");
-            alert.setContentText("Fee must be less than $1,000,000.00");
-            alert.showAndWait();
+            popUpAlert("Fee Too Long", "Fee must be less than $1,000,000.00", tfCFee);
         }
         //Check to see if Fee is less than $1,000,000.00
         else if (tfCFee.getText().contains(".") == false &&
                     tfCFee.getText().length() > 6){
-            
-            alert.setHeaderText("Fee Too Long");
-            alert.setContentText("Fee must be less than $1,000,000.00");
-            alert.showAndWait();
-            tfCFee.requestFocus();
+            popUpAlert("Fee Too Long", "Fee must be less than $1,000,000.00", tfCFee);
         }
         //Check to see if House Number fits into an integer constraint
         else if (tfCHouseNumber.getText().length() > 10){
-            
-            alert.setHeaderText("House Number Too Long");
-            alert.setContentText("Only 10 characters allowed for a House Number");
-            alert.showAndWait();
-            tfCHouseNumber.requestFocus();
+            popUpAlert("House Number Too Long", "Only 10 characters allowed for a House Number", tfCHouseNumber);
         }
         //Check to see if House number is a number; acknowledge the max integer constraint
-        else if(isInteger(tfCHouseNumber.getText()) == false &&
-                !"".equals(tfCHouseNumber.getText())){
-            
-            alert.setHeaderText("House Number must be an integer");
-            alert.setContentText("Please enter a number for House Number\n"
+        else if(isInteger(tfCHouseNumber.getText()) == false && !"".equals(tfCHouseNumber.getText())){
+            popUpAlert("House Number must be an integer", "Please enter a number for House Number\n"
                     + "\n"
-                    + "House Number must be less than 2,147,483,648");
-            alert.showAndWait();
-            tfCHouseNumber.requestFocus();
+                    + "House Number must be less than 2,147,483,648", tfCHouseNumber);
         }
         //Check to see if Street is less than 50 characters
         else if (tfCStreet.getText().length() > 50){
-            
-            alert.setHeaderText("Street Too Long");
-            alert.setContentText("Only 50 characters allowed for a Street");
-            alert.showAndWait();
-            tfCStreet.requestFocus();
+            popUpAlert("Street Too Long", "Only 50 characters allowed for a Street", tfCStreet);
         }
         //Check to see if City or County is less than 40 characters
         else if (tfCCityCounty.getText().length() > 40){
-            
-            alert.setHeaderText("City / County Too Long");
-            alert.setContentText("Only 40 characters allowed for a City or County");
-            alert.showAndWait();
-            tfCCityCounty.requestFocus();
+            popUpAlert("City / County Too Long", "Only 40 characters allowed for a City or County", tfCCityCounty);
         }
         //Check to see if ZipCode is greater than 5 characters
         else if (tfCZipCode.getText().length() > 5){
-            
-            alert.setHeaderText("Zip Code Too Long");
-            alert.setContentText("Only 5 characters allowed for a Zip Code");
-            alert.showAndWait();
-            tfCZipCode.requestFocus();
+            popUpAlert("Zip Code Too Long", "Only 5 characters allowed for a Zip Code", tfCZipCode);
         }
         //Check to see if ZipCode is less than 5 characters
-        else if (!"".equals(tfCZipCode.getText()) &&
-                tfCZipCode.getText().length() < 5){
-            
-            alert.setHeaderText("Zip Code Too Short");
-            alert.setContentText("Zip Code must have 5 characters");
-            alert.showAndWait();
-            tfCZipCode.requestFocus();
+        else if (!"".equals(tfCZipCode.getText()) && tfCZipCode.getText().length() < 5){
+            popUpAlert("Zip Code Too Short", "Zip Code must have 5 characters", tfCZipCode);
         }
         //Check to see if ZipCode is a number IF the field is not empty
         else if(isInteger(tfCZipCode.getText()) == false && !"".equals(tfCZipCode.getText())){
-            
-            alert.setHeaderText("Zip Code must be an integer");
-            alert.setContentText("Please enter a number for Zip Code");
-            alert.showAndWait();
-            tfCZipCode.requestFocus();
+            popUpAlert("Zip Code must be an integer", "Please enter a number for Zip Code", tfCZipCode);
         }
         //Check to see if UpdatedBy is null
         else if("".equals(tfCUpdatedBy.getText())){
-            
-            alert.setHeaderText("No Ownership to Update Specified");
-            alert.setContentText("Please write your name in the \"Updated By\" box");
-            alert.showAndWait();
-            tfCUpdatedBy.requestFocus();
+            popUpAlert("No Ownership to Update Specified", "Please write your name in the \"Updated By\" box", tfCUpdatedBy);
         }
         //Check to see if UpdatedBy is less than 20 characters
         else if (tfCUpdatedBy.getText().length()> 20){
-            
-            alert.setHeaderText("Updated By Too Long");
-            alert.setContentText("Only 20 characters allowed for an Updated By Ownership");
-            alert.showAndWait();
-            tfCUpdatedBy.requestFocus();
+            popUpAlert("Updated By Too Long", "Only 20 characters allowed for an Updated By Ownership", tfCUpdatedBy);
         }
         //Check to see if Contractor array last location is empty
         else if (arrayContractor[FIXED_ARRAY_SIZE-1] != null){
-            
-            alert.setHeaderText("Contractor Array is Full!");
-            alert.setContentText("You must commit the Contractor Array \n"
-                    + "before adding a new Contractor!");
-            alert.showAndWait();
-            btnCCommit.requestFocus();
+            popUpAlert("Contractor Array is Full!", "You must commit the Contractor Array \n"
+                    + "before adding a new Contractor!", tfContractorID);
         }
         //Check to see if the Contractor array is empty or has atleast one value
         else if (arrayContractor[0] != null){
@@ -1363,21 +1264,13 @@ public class Lab1 extends Application{
                 if (arrayContractor[i] != null){
                     if (checkForSameContractorID()){
                         //if same id, display
-                        
-                        alert.setHeaderText("Contractor ID unique");
-                        alert.setContentText("Please use a different Contractor ID");
-                        alert.showAndWait();
-                        tfContractorID.requestFocus();
+                        popUpAlert("Contractor ID unique", "Please use a different Contractor ID", tfContractorID);
                         break;
                     }
                     else if (checkForSameContractorName()){
                         //if same exact name, display
-                        
-                        alert.setHeaderText("Contractor Name must be unique");
-                        alert.setContentText("Contractor Name already exists:\n"
-                            + "Please enter a drifferent Contractor Name");
-                        alert.showAndWait();
-                        tfCFirstName.requestFocus();
+                        popUpAlert("Contractor Name must be unique", "Contractor Name already exists:\n"
+                            + "Please enter a drifferent Contractor Name", tfCFirstName);
                         break;
                     }
                     else{
@@ -1473,7 +1366,9 @@ public class Lab1 extends Application{
                     return true;
                 }
             }
-        }catch (SQLException e) {}
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
         return false;
     }
     
@@ -1499,7 +1394,9 @@ public class Lab1 extends Application{
                 if (dbNameConcatenated.equals(tfNameConcatenated))
                     return true;
             }
-        }catch (SQLException e) {}
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
         return false;
     }
     
@@ -1515,7 +1412,9 @@ public class Lab1 extends Application{
                     return true;
                 }
             }
-        }catch (SQLException e) {}
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
         return false;
     }
     
@@ -1534,7 +1433,9 @@ public class Lab1 extends Application{
                 if (tfVinPlaceholder.equals(dbVinPlaceholder))
                     return true;
             }
-        }catch (SQLException e) {}
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
         return false;
     }
     
@@ -1552,7 +1453,8 @@ public class Lab1 extends Application{
           double d = Integer.parseInt(str);
         }
         catch(NumberFormatException nfe){
-          return false;
+            System.out.println(nfe);
+            return false;
         }
         return true;
     }
@@ -1563,7 +1465,8 @@ public class Lab1 extends Application{
           double d = Double.parseDouble(str);
         }
         catch(NumberFormatException nfe){
-          return false;
+            System.out.println(nfe);
+            return false;
         }
         return true;
     }
@@ -1577,6 +1480,7 @@ public class Lab1 extends Application{
             df.parse(date);
             return true;
         } catch (ParseException e) {
+            System.out.println(e);
             return false;
         }
 }
@@ -1593,7 +1497,9 @@ public class Lab1 extends Application{
             commStmt = dbConn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, 
                     ResultSet.CONCUR_READ_ONLY);
             dbResults = commStmt.executeQuery(sqlQuery);
-            }catch (SQLException e){}  
+            }catch (SQLException e){
+                System.out.println(e);
+            }  
         }
         
     public HBox addTopHBox(){
@@ -1903,7 +1809,6 @@ public class Lab1 extends Application{
         
         return gridPane;
     }
-    
     
     public static void main(String[] args) {
         Application.launch(args);   
