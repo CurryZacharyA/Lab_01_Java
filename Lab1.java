@@ -843,13 +843,9 @@ public class Lab1 extends Application{
         olCountryList = FXCollections.observableArrayList(countryList);
     }
     
-    public void loadContractorIDFromDB(){
-        //populate contractors into contractor dropdown
+    public void loadPersonFromDB(String localSqlQuery, ArrayList<String> localArrayList){
         try{
-            sqlQuery = "SELECT CONTRACTORID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
-                        + "FROM CONTRACTOR";
-            sendDBCommand(sqlQuery);
-            driverContractorList.clear();
+            localArrayList.clear();
             while (dbResults.next()){
                 String nameConcatenated = null;
                 nameConcatenated = dbResults.getString(1);
@@ -857,30 +853,23 @@ public class Lab1 extends Application{
                 if (dbResults.getString(4) != null)
                     nameConcatenated += " " + dbResults.getString(4);
                 nameConcatenated += " " + dbResults.getString(3);
-                driverContractorList.add(nameConcatenated);
+                localArrayList.add(nameConcatenated);
             }
-            olContractorID = FXCollections.observableArrayList(driverContractorList);
         }catch (SQLException e) {}
+    }
+    
+    public void loadContractorIDFromDB(){
+        //populate contractors into contractor dropdown
+        loadPersonFromDB("SELECT CONTRACTORID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
+                        + "FROM CONTRACTOR", driverContractorList);
+            olContractorID = FXCollections.observableArrayList(driverContractorList);
     }
     
     public void loadDriverIDFromDB(){
         //populate drivers on driver dropdown
-        try{
-                sqlQuery = "SELECT DRIVERID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
-                            + "FROM DRIVER";
-                    sendDBCommand(sqlQuery);
-                    equipmentDriverList.clear();
-                    while (dbResults.next()){
-                        String nameConcatenated = null;
-                        nameConcatenated = dbResults.getString(1);
-                        nameConcatenated += " - " + dbResults.getString(2);
-                        if (dbResults.getString(4) != null)
-                            nameConcatenated += " " + dbResults.getString(4);
-                        nameConcatenated += " " + dbResults.getString(3);
-                        equipmentDriverList.add(nameConcatenated);
-                    }
+        loadPersonFromDB("SELECT DRIVERID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
+                            + "FROM DRIVER", equipmentDriverList);
             olDriverID = FXCollections.observableArrayList(equipmentDriverList);
-        }catch (SQLException e) {}
     }
     
     public void commitContractor(){
