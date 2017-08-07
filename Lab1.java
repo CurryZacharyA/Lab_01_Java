@@ -293,48 +293,48 @@ public class Lab1 extends Application{
     public void displayTotalFees(){
         //Declare string and set to null
         String totalFees = null;
-            try{
-                //Count Contractors in the database
-                sqlQuery = "SELECT COUNT(CONTRACTORID) FROM CONTRACTOR";
-                sendDBCommand(sqlQuery);
-                //If atleast one contractor in database then continue
-                while (dbResults.next()){
-                    if (Integer.parseInt(dbResults.getString(1)) > 0){
-                        try{                        
-                            //Get the sum of all commited Contractor's fees
-                            sqlQuery = "SELECT SUM(FEE) FROM CONTRACTOR";
-                            sendDBCommand(sqlQuery);
-                            while (dbResults.next()){
-                                //Display Total Fees and format to Dollars
-                                totalFees = "Total amount of Fees for all committed Contractors\n"
-                                + " -------------------------------------------\n"
-                                + "$" + String.format("%.2f",
-                                        Double.parseDouble(dbResults.getString(1)));
-                            }
-                            //Show String in bottom field
-                            taDisplayData.setText(totalFees);
-                        }catch (NullPointerException npe){
-                            //if no fees enter for any contractor, display
-                            Alert alert = new Alert(AlertType.ERROR);
-                            alert.setHeaderText("No Contractor Fees entered into Database");
-                            alert.setContentText("Please commit atleast one Contractor Fee to the Database");
-                            alert.showAndWait();
-                            layout.setCenter(createCGridPane());
-                            tfCFee.requestFocus();
-                            break;
+        try{
+            //Count Contractors in the database
+            sqlQuery = "SELECT COUNT(CONTRACTORID) FROM CONTRACTOR";
+            sendDBCommand(sqlQuery);
+            //If atleast one contractor in database then continue
+            while (dbResults.next()){
+                if (Integer.parseInt(dbResults.getString(1)) > 0){
+                    try{                        
+                        //Get the sum of all commited Contractor's fees
+                        sqlQuery = "SELECT SUM(FEE) FROM CONTRACTOR";
+                        sendDBCommand(sqlQuery);
+                        while (dbResults.next()){
+                            //Display Total Fees and format to Dollars
+                            totalFees = "Total amount of Fees for all committed Contractors\n"
+                            + " -------------------------------------------\n"
+                            + "$" + String.format("%.2f",
+                                    Double.parseDouble(dbResults.getString(1)));
                         }
-                    }
-                    else{
-                        //if not contractors in database, display
+                        //Show String in bottom field
+                        taDisplayData.setText(totalFees);
+                    }catch (NullPointerException npe){
+                        //if no fees enter for any contractor, display
                         Alert alert = new Alert(AlertType.ERROR);
-                        alert.setHeaderText("No Contractors in Database");
-                        alert.setContentText("Please commit atleast one Contractor to the Database");
+                        alert.setHeaderText("No Contractor Fees entered into Database");
+                        alert.setContentText("Please commit atleast one Contractor Fee to the Database");
                         alert.showAndWait();
                         layout.setCenter(createCGridPane());
-                        tfContractorID.requestFocus();
+                        tfCFee.requestFocus();
+                        break;
                     }
                 }
-            }catch (SQLException e) {}
+                else{
+                    //if not contractors in database, display
+                    Alert alert = new Alert(AlertType.ERROR);
+                    alert.setHeaderText("No Contractors in Database");
+                    alert.setContentText("Please commit atleast one Contractor to the Database");
+                    alert.showAndWait();
+                    layout.setCenter(createCGridPane());
+                    tfContractorID.requestFocus();
+                }
+            }
+        }catch (SQLException e) {}
     }
     
     public void displayDriverEquipment(){
@@ -819,34 +819,28 @@ public class Lab1 extends Application{
         myDriver.reset();
     }
     
-    public void loadStatesDataFromDB(){
-        //Populate states into dropdowns
+    public void loadFromDB(String localSqlQuery, String localArray[]){
         try{
-            Integer i = 0;
-            sqlQuery = "SELECT STATEABB FROM JAVAUSER.HOMESTATE";
-            sendDBCommand(sqlQuery);
-            while (dbResults.next()){                    
-                    stateList[i] = dbResults.getString(1);
-                    i++;
-                    }
-            olStateList = FXCollections.observableArrayList(stateList);
+            int i = 0;
+            sendDBCommand(localSqlQuery);
+            while (dbResults.next()){
+                localArray[i] = dbResults.getString(1);
+                i++;
+            }
         }catch (SQLException e) {
         }
     }
     
+    public void loadStatesDataFromDB(){
+        //Populate states into dropdowns
+        loadFromDB("SELECT STATEABB FROM JAVAUSER.HOMESTATE", stateList);
+        olStateList = FXCollections.observableArrayList(stateList);
+    }
+    
     public void loadCountriesDataFromDB(){
         //populate countries into dropdowns
-        try{
-            Integer i = 0;
-            sqlQuery = "SELECT COUNTRYABB FROM JAVAUSER.COUNTRY";
-            sendDBCommand(sqlQuery);
-            while (dbResults.next()){                    
-                    countryList[i] = dbResults.getString(1);
-                    i++;
-                    }
-            olCountryList = FXCollections.observableArrayList(countryList);
-        }catch (SQLException e) {
-        }
+        loadFromDB("SELECT COUNTRYABB FROM JAVAUSER.COUNTRY", countryList);
+        olCountryList = FXCollections.observableArrayList(countryList);
     }
     
     public void loadContractorIDFromDB(){
