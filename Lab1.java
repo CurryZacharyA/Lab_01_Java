@@ -55,7 +55,7 @@ public class Lab1 extends Application{
     
     //Set Dates and Date Constraints
     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-    String currentDate = getCurrentTimeStamp();
+    String currentDate = getCurrentDate();
     Integer currentYear = Integer.parseInt(currentDate.substring(6,10));
     String tooOld;
     String tooYoung;
@@ -1202,7 +1202,7 @@ public class Lab1 extends Application{
             arrayContractor[i].setCountryAbb(cbCCountry);
             arrayContractor[i].setFee(tfCFee.getText());
             arrayContractor[i].setLastUpdatedBy(tfCUpdatedBy.getText());
-            arrayContractor[i].setLastUpdated(getCurrentTimeStamp());
+            arrayContractor[i].setLastUpdated(getCurrentDate());
             break;
         }
     }
@@ -1249,7 +1249,7 @@ public class Lab1 extends Application{
             Date dateSeventyFiveAfterDOB = cal.getTime();
             seventyFiveAfterDOB = sdf.format(dateSeventyFiveAfterDOB);
             //find drivers age
-            cal.setTime(sdf.parse(getCurrentTimeStamp()));
+            cal.setTime(sdf.parse(getCurrentDate()));
             Integer dateDOBYear = Integer.parseInt(tfDDateOfBirth.getText().substring(6, 10));
             Integer dateDOBMonth = Integer.parseInt(tfDDateOfBirth.getText().substring(0, 2));
             Integer dateDOBDay = Integer.parseInt(tfDDateOfBirth.getText().substring(3, 5));
@@ -1968,7 +1968,7 @@ public class Lab1 extends Application{
             myDriver.setLastUpdatedBy("NULL");
         else myDriver.setLastUpdatedBy(tfDUpdatedBy.getText());
         //Assign LastUpdated to myDriver
-        myDriver.setLastUpdated(getCurrentTimeStamp());
+        myDriver.setLastUpdated(getCurrentDate());
     }
     
     public void commitEquipment(){
@@ -2249,11 +2249,11 @@ public class Lab1 extends Application{
             myEquipment.setLastUpdatedBy("NULL");
         else myEquipment.setLastUpdatedBy(tfDUpdatedBy.getText());
         //Assign LastUpdated to myEquipment
-        myEquipment.setLastUpdated(getCurrentTimeStamp());
+        myEquipment.setLastUpdated(getCurrentDate());
         
     }
     
-    public static String getCurrentTimeStamp(){
+    public static String getCurrentDate(){
         //get current time and format to MM/dd/yyyy
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
         long longDate = System.currentTimeMillis();

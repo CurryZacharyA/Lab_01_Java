@@ -7,173 +7,86 @@ On my honor, I have neither given nor received any unauthorized assistance on
 this academic work
 */
 
-public class Driver {
-    Integer DriverID, ContractorID, HouseNumber;
-    String FirstName, LastName, MiddleInitial,Street, CityCounty, StateAbb,
-            CountryAbb, ZipCode, DateOfBirth, CDL, CDLDate, HireDate,
-            TerminationDate, LastUpdatedBy, LastUpdated;
-    Double Salary;
+public class Driver
+  extends Person {
+    private int driverID, contractorID;
+    private static int driverIDCount = 0;
+    private String dateOfBirth, driverCDL, driverCDLDate, hireDate,
+            terminationDate;
+    private double salary ;
     
     public Driver(){
         //Data Fields
-        DriverID = 0;
-        FirstName = null;
-        LastName = null;
-        MiddleInitial = null;
-        Salary = null;
-        ContractorID = 0;
-        HouseNumber = null;
-        Street = null;
-        CityCounty = null;
-        StateAbb = null;
-        CountryAbb = null;
-        ZipCode = null;
-        DateOfBirth = null;
-        CDL = null;
-        CDLDate = null;
-        HireDate = null;
-        TerminationDate = null;
-        LastUpdatedBy = null;
-        LastUpdated = null;
+        driverID = ++driverIDCount;
+        salary = 0.0;
+        contractorID = 0;
+        dateOfBirth = "";
+        driverCDL = "";
+        driverCDLDate = "";
+        hireDate = "";
+        terminationDate = "";
     }
     
     //Setter Methods
-    public void setDriverID(int i){
-        this.DriverID = i;
+    public void setDriverID(int driverIDPassed){
+        this.driverID = driverIDPassed;
     }
-    public void setFirstName(String a){
-        this.FirstName = a;
+    public void setContractorID(int contractorIDPassed){
+        this.contractorID = contractorIDPassed;
     }
-    public void setLastName(String a){
-        this.LastName = a;
+    public void setSalary(Double salaryPassed){
+        this.salary = salaryPassed;
     }
-    public void setMiddleInitial(String a){
-        this.MiddleInitial = a;
+    public void setDateOfBirth(String dateOfBirthPassed){
+        this.dateOfBirth = dateOfBirthPassed;
     }
-    public void setSalary(Double d){
-        this.Salary = d;
+    public void setCDL(String driverCDLPassed){
+        this.driverCDL = driverCDLPassed;
     }
-    public void setContractorID(int i){
-        this.ContractorID = i;
+    public void setCDLDate(String driverCDLDatePassed){
+        this.driverCDLDate = driverCDLDatePassed;
     }
-    public void setHouseNumber(int i){
-        this.HouseNumber = i;
+    public void setHireDate(String hireDatePassed){
+        this.hireDate = hireDatePassed;
     }
-    public void setStreet(String a){
-        this.Street = a;
-    }
-    public void setCityCounty(String a){
-        this.CityCounty = a;
-    }
-    public void setStateAbb(String a){
-        this.StateAbb = a;
-    }
-    public void setCountryAbb(String a){
-        this.CountryAbb = a;
-    }
-    public void setZipCode(String a){
-        this.ZipCode = a;
-    }
-    public void setDateOfBirth(String a){
-        this.DateOfBirth = a;
-    }
-    public void setCDL(String a){
-        this.CDL = a;
-    }
-    public void setCDLDate(String a){
-        this.CDLDate = a;
-    }
-    public void setHireDate(String a){
-        this.HireDate = a;
-    }
-    public void setTerminationDate(String a){
-        this.TerminationDate = a;
-    }
-    public void setLastUpdatedBy(String a){
-        this.LastUpdatedBy = a;
-    }
-    public void setLastUpdated(String a){
-        this.LastUpdated = a;
+    public void setTerminationDate(String terminationDatePassed){
+        this.terminationDate = terminationDatePassed;
     }
     
     //Getter Methods
-    public Integer getDriverID(){
-        return this.DriverID;
+    public int getDriverID(){
+        return this.driverID;
     }
-    public String getFirstName(){
-        return this.FirstName;
+    public double getSalary(){
+        return this.salary;
     }
-    public String getLastName(){
-        return this.LastName;
-    }
-    public String getMiddleInitial(){
-        return this.MiddleInitial;
-    }
-    public Double getSalary(){
-        return this.Salary;
-    }
-    public Integer getContractorID(){
-        return this.ContractorID;
-    }
-    public Integer getHouseNumber(){
-        return this.HouseNumber;
-    }
-    public String getStreet(){
-        return this.Street;
-    }
-    public String getCityCounty(){
-        return this.CityCounty;
-    }
-    public String getStateAbb(){
-        return this.StateAbb;
-    }
-    public String getCountryAbb(){
-        return this.CountryAbb;
-    }
-    public String getZipCode(){
-        return this.ZipCode;
+    public int getContractorID(){
+        return this.contractorID;
     }
     public String getDateOfBirth(){
-        return this.DateOfBirth;   
+        return this.dateOfBirth;   
     }
     public String getCDL(){
-        return this.CDL;
+        return this.driverCDL;
     }
     public String getCDLDate(){
-        return this.CDLDate;
+        return this.driverCDLDate;
     }
     public String getHireDate(){
-        return this.HireDate;
+        return this.hireDate;
     }
     public String getTerminationDate(){
-        return this.TerminationDate;
-    }
-    public String getLastUpdatedBy(){
-        return this.LastUpdatedBy;
-    }
-    public String getLastUpdated(){
-        return this.LastUpdated;
+        return this.terminationDate;
     }
     
     public void reset(){
-        DriverID = 0;
-        FirstName = null;
-        LastName = null;
-        MiddleInitial = null;
-        Salary = null;
-        ContractorID = 0;
-        HouseNumber = null;
-        Street = null;
-        CityCounty = null;
-        StateAbb = null;
-        CountryAbb = null;
-        ZipCode = null;
-        DateOfBirth = null;
-        CDL = null;
-        CDLDate = null;
-        HireDate = null;
-        TerminationDate = null;
-        LastUpdatedBy = null;
-        LastUpdated = null;
+        driverID = 0;
+        salary = 0.0;
+        contractorID = 0;
+        dateOfBirth = null;
+        driverCDL = null;
+        driverCDLDate = null;
+        hireDate = null;
+        terminationDate = null;
     }
 }
