@@ -8,14 +8,15 @@ this academic work
 */
 
 public class Person {
-    private int personID = 0, houseNumber;
+    private int personID, houseNumber;
+    private static int personIDCounter = 0;
     private String firstName, lastName, middleInitial, street, cityCounty, stateAbb,
             countryAbb, zipCode, lastUpdatedBy, lastUpdated;
     
     //Constructor
     public Person() {
         //Data Fields
-        personID = ++personID;
+        personID = ++personIDCounter;
         firstName = "";
         lastName = "";
         middleInitial = "";
