@@ -5,12 +5,13 @@ Zachary Curry
 
 On my honor, I have neither given nor received any unauthorized assistance on
 this academic work
+
+UPDATED 8/8/17 8:30pm
 */
 
-public class Driver
-  extends Person {
+public class Driver extends Person {
     private int driverID, contractorID;
-    private static int driverIDCount = 0;
+    private int driverIDCount = 0;
     private String dateOfBirth, driverCDL, driverCDLDate, hireDate,
             terminationDate;
     private double salary ;
@@ -25,6 +26,17 @@ public class Driver
         driverCDLDate = "";
         hireDate = "";
         terminationDate = "";
+        this.setFirstName("");
+        this.setLastName("");
+        this.setMiddleInitial("");
+        this.setHouseNumber(0);
+        this.setStreet("");
+        this.setCityCounty("");
+        this.setStateAbb("");
+        this.setCountryAbb("");
+        this.setZipCode("");
+        this.setLastUpdatedBy("");
+        this.setLastUpdated("");
     }
     
     //Setter Methods

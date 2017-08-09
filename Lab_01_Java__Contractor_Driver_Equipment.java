@@ -2,6 +2,7 @@ package Lab_01_Java;
 
 /*
 Zachary Curry
+
 On my honor, I have neither given nor received any unauthorized assistance on
 this academic work
 */
@@ -27,7 +28,7 @@ import javafx.scene.text.*;
 import javafx.stage.Stage;
 import oracle.jdbc.pool.*;
 
-public class Lab1 extends Application{
+public class Lab_01_Java__Contractor_Driver_Equipment extends Application{
     //Set up connection strings
     Connection dbConn;
     Statement commStmt;
@@ -290,7 +291,7 @@ public class Lab1 extends Application{
         primaryStage.setTitle("Lab 1 - Zachary Curry");
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
+    }//
     
     public void displayTotalFees(){
         //Declare string and set to null
@@ -331,7 +332,7 @@ public class Lab1 extends Application{
         }catch (SQLException e) {
             System.out.println(e);
         }
-    }
+    }//
     
     //FIND BETTER WAY
     public void displayDriverEquipment(){
@@ -381,7 +382,7 @@ public class Lab1 extends Application{
         }catch (SQLException e) {
             System.out.println(e);
         }
-    }
+    }//
     
     public HBox addTopHBox(){
         HBox hbTopPane = new HBox();
@@ -689,32 +690,36 @@ public class Lab1 extends Application{
         gridPane.add(btnECommit, 5, 0);
         
         return gridPane;
-    }
+    }//
     
     public void insertContractorValuesIntoDB(int i){
         //Set up Contractor Array Values into SQL language
         //in order to insert into the Contractor Table in the Database
         sqlQuery = "INSERT INTO JAVAUSER.CONTRACTOR VALUES(";
-        sqlQuery += "'" + arrayContractor[i].getContratorID().toString() + "', ";
+        sqlQuery += "'" + arrayContractor[i].getContratorID() + "', "; ////Problem here???? int no Integer yes??
         sqlQuery += "'" + arrayContractor[i].getFirstName() + "', ";
         sqlQuery += "'" + arrayContractor[i].getLastName() + "', ";
-        sqlQuery += "'" + arrayContractor[i].getMiddleInitial() + "', ";
-        if (arrayContractor[i].getHouseNumber() == 0)
-            sqlQuery += "NULL, ";
-        else sqlQuery += "'" + arrayContractor[i].getHouseNumber().toString() + "', ";
-        sqlQuery += "'" + arrayContractor[i].getStreet()+ "', ";
-        sqlQuery += "'" + arrayContractor[i].getCityCounty() + "', ";
-        sqlQuery += "'" + arrayContractor[i].getStateAbb() + "', ";
-        sqlQuery += "'" + arrayContractor[i].getCountryAbb() + "', ";
-         sqlQuery += "'" + arrayContractor[i].getZipCode() + "', ";
+        sqlQuery += "'" + checkForNullSQL(arrayContractor[i].getMiddleInitial()) + "', ";
+        sqlQuery += "'" + checkForNullSQL(arrayContractor[i].getHouseNumber().toString()) + "', ";
+        sqlQuery += "'" + checkForNullSQL(arrayContractor[i].getStreet())+ "', ";
+        sqlQuery += "'" + checkForNullSQL(arrayContractor[i].getCityCounty()) + "', ";
+        sqlQuery += "'" + checkForNullSQL(arrayContractor[i].getStateAbb()) + "', ";
+        sqlQuery += "'" + checkForNullSQL(arrayContractor[i].getCountryAbb()) + "', ";
+        sqlQuery += "'" + checkForNullSQL(arrayContractor[i].getZipCode()) + "', ";
         if (arrayContractor[i].getFee() == 0)
             sqlQuery += "NULL, ";
-        else sqlQuery += "'" + arrayContractor[i].getFee().toString() + "', ";
+        else sqlQuery += "'" + Double.toString(arrayContractor[i].getFee()) + "', ";
         sqlQuery += "'" + arrayContractor[i].getLastUpdatedBy() + "', ";
         sqlQuery += "TO_DATE('" + arrayContractor[i].getLastUpdated() + "', 'MM/DD/YYYY'))";
         sendDBCommand(sqlQuery);
         //reset contractor array
         arrayContractor[i] = null;
+    }//
+    
+    public String checkForNullSQL(Object sql){
+        if (sql.equals("NULL"))
+            sql = "'NULL'";
+        return sql.toString();
     }
     
     public void insertDriverValuesIntoDB(){
@@ -753,7 +758,7 @@ public class Lab1 extends Application{
         sendDBCommand(sqlQuery);
         //reset myDriver object
         myDriver.reset();
-    }
+    }//
     
     public void insertEquipmentValuesIntoDB(){
         //Format a SQL Statement to insert Equipment Values
@@ -775,33 +780,61 @@ public class Lab1 extends Application{
         sendDBCommand(sqlQuery);
         //reset myDriver object
         myDriver.reset();
-    }
+    }//
     
     public void loadStatesDataFromDB(){
         //Populate states into dropdowns
-        Lab1.this.loadFromDB("SELECT STATEABB FROM JAVAUSER.HOMESTATE", stateList);
+        loadFromDB("SELECT STATEABB FROM JAVAUSER.HOMESTATE", stateList);
         olStateList = FXCollections.observableArrayList(stateList);
-    }                                               //looks good
+    }//                                               //looks good
     
     public void loadCountriesDataFromDB(){
         //populate countries into dropdowns
-        Lab1.this.loadFromDB("SELECT COUNTRYABB FROM JAVAUSER.COUNTRY", countryList);
+        this.loadFromDB("SELECT COUNTRYABB FROM JAVAUSER.COUNTRY", countryList);
         olCountryList = FXCollections.observableArrayList(countryList);
-    }                                           //looks good
+    }//                                           //looks good
     
     public void loadContractorIDFromDB(){
         //populate contractors into contractor dropdown
-        loadFromDB("SELECT CONTRACTORID, FIRSTNAME, LASTNAME, "
+        try{
+            loadFromDB("SELECT CONTRACTORID, FIRSTNAME, LASTNAME, "
                 + "MIDDLEINITIAL FROM CONTRACTOR", driverContractorList);
-        olContractorID = FXCollections.observableArrayList(driverContractorList);
-    }                                           //looks good
+            driverContractorList.clear();
+            while (dbResults.next()){
+                String nameConcatenated = null;
+                nameConcatenated = dbResults.getString(1);
+                nameConcatenated += " - " + dbResults.getString(2);
+                if (dbResults.getString(4) != null)
+                    nameConcatenated += " " + dbResults.getString(4);
+                nameConcatenated += " " + dbResults.getString(3);
+                driverContractorList.add(nameConcatenated);
+            }
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
+         olContractorID = FXCollections.observableArrayList(driverContractorList);
+    }                                         //looks good
     
     public void loadDriverIDFromDB(){
         //populate drivers on driver dropdown
-        loadFromDB("SELECT DRIVERID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
+        try{
+            loadFromDB("SELECT DRIVERID, FIRSTNAME, LASTNAME, MIDDLEINITIAL "
                 + "FROM DRIVER", equipmentDriverList);
-        olDriverID = FXCollections.observableArrayList(equipmentDriverList);
-    }                                               //looks good
+            equipmentDriverList.clear();
+            while (dbResults.next()){
+                String nameConcatenated = null;
+                nameConcatenated = dbResults.getString(1);
+                nameConcatenated += " - " + dbResults.getString(2);
+                if (dbResults.getString(4) != null)
+                    nameConcatenated += " " + dbResults.getString(4);
+                nameConcatenated += " " + dbResults.getString(3);
+                equipmentDriverList.add(nameConcatenated);
+            }
+            olDriverID = FXCollections.observableArrayList(equipmentDriverList);
+        }catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
     
     public void commitButtonContractor(){
         //Check first location in contractor array
@@ -827,7 +860,7 @@ public class Lab1 extends Application{
             driverContractorList.clear();
             equipmentDriverList.clear();
         }
-    }
+    }//
     
     public void insertButtonContractor(){
         //Check to see if ContractorID Field Empty
@@ -889,8 +922,7 @@ public class Lab1 extends Application{
             popUpAlert("Fee Too Long", "Fee must be less than $1,000,000.00", tfCFee);
         }
         //Check to see if Fee is less than $1,000,000.00
-        else if (tfCFee.getText().contains(".") == false &&
-                    tfCFee.getText().length() > 6){
+        else if (tfCFee.getText().contains(".") == false && tfCFee.getText().length() > 6){
             popUpAlert("Fee Too Long", "Fee must be less than $1,000,000.00", tfCFee);
         }
         //Check to see if House Number fits into an integer constraint
@@ -942,7 +974,7 @@ public class Lab1 extends Application{
                 //Check to see if current i location in Contractor Array is empty
                 if (arrayContractor[i] != null){
                     if (checkForSameContractorID()){
-                        //if same id, display
+                            //if same id, display
                         popUpAlert("Contractor ID unique", "Please use a different Contractor ID", tfContractorID);
                         break;
                     }
@@ -964,8 +996,7 @@ public class Lab1 extends Application{
             assignContractorValues();
             tfContractorID.requestFocus();
         }
-        
-    }
+    }//
     
     public boolean checkForSameContractorID(){
         //check each location in contractor array for exact same integer
@@ -975,9 +1006,8 @@ public class Lab1 extends Application{
                     return true;
         }
         return false;
-    }
+    }//
     
-    //CHECK AND SEE IF EASIER WAY
     public boolean checkForSameContractorName(){
         String arrayNameConcatenated = null;
         String tfNameConcatenated = null;
@@ -998,14 +1028,14 @@ public class Lab1 extends Application{
             }
         }
         return false;
-    }
+    }//
     
     public void assignContractorValues(){
         //Start at first free location in Contractor Array
         for (int i=0; i<arrayContractor.length; i++){
             if (arrayContractor[i] == null){
                 arrayContractor[i] = new Contractor();
-            }
+            
             arrayContractor[i].setContractorID(Integer.parseInt(tfContractorID.getText()));
             arrayContractor[i].setFirstName(tfCFirstName.getText());
             arrayContractor[i].setMiddleInitial(tfCMI.getText());
@@ -1014,14 +1044,15 @@ public class Lab1 extends Application{
             arrayContractor[i].setHouseNumber(tfCHouseNumber.getText());
             arrayContractor[i].setStreet(tfCStreet.getText());
             arrayContractor[i].setCityCounty(tfCCityCounty.getText());
-            arrayContractor[i].setStateAbb(cbCHomeState);
+            arrayContractor[i].setStateAbb(cbCHomeState.getValue());
             arrayContractor[i].setZipCode(tfCZipCode.getText());
-            arrayContractor[i].setCountryAbb(cbCCountry);
+            arrayContractor[i].setCountryAbb(cbCCountry.getValue());
             arrayContractor[i].setLastUpdatedBy(tfCUpdatedBy.getText());
             arrayContractor[i].setLastUpdated(getCurrentDate());
             break;
+            }
         }
-    }                      //looks good 8/7/17 11AM
+    }//                      //looks good 8/7/17 11AM
     
     public boolean checkDateOfBirth(){
         //Date of Birth validations
@@ -1377,8 +1408,7 @@ public class Lab1 extends Application{
     public boolean checkForSameDriverID(){
         //check database for exact match of driverid
         try{
-            sqlQuery = "SELECT DRIVERID FROM DRIVER";
-            sendDBCommand(sqlQuery);
+            sendDBCommand("SELECT DRIVERID FROM DRIVER");
             while (dbResults.next()){
                 String placeholderDriverID = null;
                 placeholderDriverID = dbResults.getString(1);
@@ -1395,8 +1425,7 @@ public class Lab1 extends Application{
     public boolean checkForSameDriverName(){
         //check database for exact match of concatenated name
         try{
-            sqlQuery = "SELECT FIRSTNAME, LASTNAME, MIDDLEINITIAL FROM DRIVER";
-            sendDBCommand(sqlQuery);
+            sendDBCommand("SELECT FIRSTNAME, LASTNAME, MIDDLEINITIAL FROM DRIVER");
             while (dbResults.next()){
                 String dbNameConcatenated = null;
                 String tfNameConcatenated = null;
@@ -1445,7 +1474,7 @@ public class Lab1 extends Application{
     public void commitButtonEquipment(){
         //Check to see if EquipmentID is empty
         if ("".equals(tfEquipmentID.getText())){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Equipment ID can't be empty");
             alert.setContentText("Please enter an Equipment ID");
             alert.showAndWait();
@@ -1453,7 +1482,7 @@ public class Lab1 extends Application{
         }
         //Check to see if DriverID has already been used
         else if(checkForSameEquipmentID()){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Equipment ID must be unique");
             alert.setContentText("Please enter a drifferent Equipment ID");
             alert.showAndWait();
@@ -1461,7 +1490,7 @@ public class Lab1 extends Application{
         }
         //Check to see if DriverName is unique
         else if(checkForSameEquipmentVin()){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Vin Number must be unique");
             alert.setContentText("Please enter a drifferent Vin Number");
             alert.showAndWait();
@@ -1469,7 +1498,7 @@ public class Lab1 extends Application{
         }
         //Check to see if EquipmentID fits into an integer constraint
         else if (tfEquipmentID.getText().length()> 10){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Equipment ID Too Long");
             alert.setContentText("Only 10 characters allowed for a Equipment ID");
             alert.showAndWait();
@@ -1478,7 +1507,7 @@ public class Lab1 extends Application{
         //Check to see if EquipmentID is a number;
         //acknowledge the max integer constraint
         else if (isInteger(tfEquipmentID.getText()) == false){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Equipment ID must be an integer");
             alert.setContentText("Please enter an number for Equipment ID\n"
                     + "\n"
@@ -1488,7 +1517,7 @@ public class Lab1 extends Application{
         }
         //Check to see if EquipmentID is a positive number
         else if (Integer.parseInt(tfEquipmentID.getText()) < 0){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Equipment ID Negative");
             alert.setContentText("Equipment ID must be a positive number");
             alert.showAndWait();
@@ -1496,7 +1525,7 @@ public class Lab1 extends Application{
         }
         //Check to see if EquipmentID is empty
         else if ("".equals(tfEVin.getText())){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Vin Number can't be empty");
             alert.setContentText("Please enter an Vin Number");
             alert.showAndWait();
@@ -1504,7 +1533,7 @@ public class Lab1 extends Application{
         }
         //Check to see if VinNumber length is less than 20 characters
         else if (tfEVin.getText().length()> 40){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Vin Number Too Long");
             alert.setContentText("Only 40 characters allowed for a Vin Number");
             alert.showAndWait();
@@ -1512,7 +1541,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Make length is less than 35 characters
         else if (tfEMake.getText().length()> 35){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Make Too Long");
             alert.setContentText("Only 35 characters allowed for a Make of Equipment");
             alert.showAndWait();
@@ -1520,7 +1549,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Model length is less than 30 characters
         else if (tfEModel.getText().length()> 30){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Model Too Long");
             alert.setContentText("Only 30 characters allowed for a Make of Equipment");
             alert.showAndWait();
@@ -1528,7 +1557,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Driver is left blank
         else if(cbEDriverID.getValue() == null){
-            
+            Alert alert = new Alert(AlertType.ERROR);
                 alert.setHeaderText("No Drivier Specified");
                 alert.setContentText("Driver can't be left blank");
                 alert.showAndWait();
@@ -1536,7 +1565,7 @@ public class Lab1 extends Application{
         }
         //Check to see if Equipment Year is more than 4 characters
         else if (tfEYear.getText().length()> 4){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Year Too Long");
             alert.setContentText("Only 4 characters allowed for a Year");
             alert.showAndWait();
@@ -1545,7 +1574,7 @@ public class Lab1 extends Application{
         //Check to see if Equipment Year is a number
         else if(!"".equals(tfEYear.getText()) &&
                 isInteger(tfEYear.getText()) == false){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Equipment Year must be an integer");
             alert.setContentText("Please enter a number for Equipment Year");
             alert.showAndWait();
@@ -1554,7 +1583,7 @@ public class Lab1 extends Application{
         //Check to see if Equipment Year is a Valid Year
         else if(!"".equals(tfEYear.getText()) &&
                 tfEYear.getText().length() < 4){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Year Too Short");
             alert.setContentText("Please enter a Year in a \"YYYY\" Format");
             alert.showAndWait();
@@ -1565,7 +1594,7 @@ public class Lab1 extends Application{
         //a year "early" just like cars (ex. in year 2017, 2018 equipment is possible
         else if(!"".equals(tfEYear.getText()) &&
                 Integer.parseInt(tfEYear.getText()) > currentYear + 1){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("This Model has not been released yet!");
             alert.setContentText("Please enter a Year older than " + (currentYear +1));
             alert.showAndWait();
@@ -1574,7 +1603,7 @@ public class Lab1 extends Application{
         //Check to see if PriceAcquired is a double IF the field is not empty
         else if(!"".equals(tfEPriceAcquired.getText()) &&
                 isDouble(tfEPriceAcquired.getText()) == false){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Price Acquired must be a double");
             alert.setContentText("Please enter a numeric amount for Price Acquired");
             alert.showAndWait();
@@ -1584,7 +1613,7 @@ public class Lab1 extends Application{
         else if(isDouble(tfEPriceAcquired.getText()) == true &&
                 !"".equals(tfEPriceAcquired.getText()) &&
                 Double.parseDouble(tfEPriceAcquired.getText()) < 0){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Price Acquired must be a positive value");
             alert.setContentText("Please enter a positive value for Price Acquired");
             alert.showAndWait();
@@ -1595,7 +1624,7 @@ public class Lab1 extends Application{
         else if (tfEPriceAcquired.getText().contains(".") == true &&
                     tfEPriceAcquired.getText().substring(tfEPriceAcquired.getText().indexOf("."),
                     tfEPriceAcquired.getText().length()).length() > 3){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Price Acquired has too many decimal places");
             alert.setContentText("Please reduce amount of decimal places for the Price Acquired");
             alert.showAndWait();
@@ -1605,7 +1634,7 @@ public class Lab1 extends Application{
         else if (tfEPriceAcquired.getText().contains(".") == true &&
                     tfEPriceAcquired.getText().substring(1,
                     tfEPriceAcquired.getText().indexOf(".")).length() > 6){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Price Acquired Too Long");
             alert.setContentText("Price Acquired must be less than $1,000,000.00");
             alert.showAndWait();
@@ -1614,7 +1643,7 @@ public class Lab1 extends Application{
         //Check to see if PriceAcquired is less than $1,000,000.00
         else if (tfEPriceAcquired.getText().contains(".") == false &&
                     tfEPriceAcquired.getText().length() > 6){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Price Acquired Too Long");
             alert.setContentText("Price Acquired must be less than $1,000,000.00");
             alert.showAndWait();
@@ -1622,7 +1651,7 @@ public class Lab1 extends Application{
         }
         //Check to see if LicenseNumber length is less than 10 characters
         else if (tfELicensePlateNumber.getText().length()> 10){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("License Plate Too Long");
             alert.setContentText("Only 10 characters allowed for a License Plate Number");
             alert.showAndWait();
@@ -1630,7 +1659,7 @@ public class Lab1 extends Application{
         }
         //Check to see if UpdatedBy is null
         else if("".equals(tfEUpdatedBy.getText())){
-            
+            Alert alert = new Alert(AlertType.ERROR);
                 alert.setHeaderText("No Ownership to Update Specified");
                 alert.setContentText("Please write your name in the \"Updated By\" box");
                 alert.showAndWait();
@@ -1638,7 +1667,7 @@ public class Lab1 extends Application{
         }
         //Check to see if UpdatedBy is less than 20 characters
         else if (tfEUpdatedBy.getText().length()> 20){
-            
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setHeaderText("Updated By Too Long");
             alert.setContentText("Only 20 characters allowed for an Updated By Ownership");
             alert.showAndWait();
@@ -1654,8 +1683,7 @@ public class Lab1 extends Application{
     public boolean checkForSameEquipmentID(){
         //check database for exact match of equipmentid
         try{
-            sqlQuery = "SELECT ID FROM EQUIPMENT";
-            sendDBCommand(sqlQuery);
+            sendDBCommand("SELECT ID FROM EQUIPMENT");
             while (dbResults.next()){
                 String placeholderEquipmentID = null;
                 placeholderEquipmentID = dbResults.getString(1);
@@ -1672,8 +1700,6 @@ public class Lab1 extends Application{
     public boolean checkForSameEquipmentVin(){
         //check database for exact match of equipment vin number
         try{
-            sqlQuery = "SELECT VINNUMBER FROM EQUIPMENT";
-            sendDBCommand(sqlQuery);
             while (dbResults.next()){
                 String dbVinPlaceholder = null;
                 String tfVinPlaceholder = null;
@@ -1763,9 +1789,9 @@ public class Lab1 extends Application{
             dbResults = commStmt.executeQuery(sqlQuery);
             }catch (SQLException e){
                 System.out.println(e);
-            }  
+            }   
         }
-    
+        
     public static void main(String[] args) {
         Application.launch(args);   
     }
@@ -1813,5 +1839,6 @@ public class Lab1 extends Application{
         alert.showAndWait();
         focusRequest.requestFocus();
     }
+    
     
 }

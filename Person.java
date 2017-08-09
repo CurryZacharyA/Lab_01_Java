@@ -9,7 +9,7 @@ this academic work
 
 public class Person {
     private int personID, houseNumber;
-    private static int personIDCounter = 0;
+    private int personIDCounter = 0;
     private String firstName, lastName, middleInitial, street, cityCounty, stateAbb,
             countryAbb, zipCode, lastUpdatedBy, lastUpdated;
     
@@ -17,9 +17,9 @@ public class Person {
     public Person() {
         //Data Fields
         personID = ++personIDCounter;
-        firstName = "";
-        lastName = "";
-        middleInitial = "";
+        firstName = "a";
+        lastName = "b";
+        middleInitial = "c";
         houseNumber = 0;
         street = "";
         cityCounty = "";
@@ -38,24 +38,19 @@ public class Person {
         this.lastName = lastNamePassed;
     }
     public void setMiddleInitial(String middleInitialPassed){
-        if (middleInitialPassed.equals(""))
-            this.middleInitial = "'NULL'";
-        else this.middleInitial = middleInitialPassed;
+        this.middleInitial = middleInitialPassed;
     }
-    public void setHouseNumber (String houseNumberPassed){
-        if (houseNumberPassed.equals(""))
-            this.houseNumber = 0;                                       //assign 0 if textbox empty
-        else this.houseNumber = Integer.parseInt(houseNumberPassed);    //assign int
+    public void setHouseNumber (String houseNumberPassed){          //String input
+        this.houseNumber = Integer.parseInt(houseNumberPassed);
+    }
+    public void setHouseNumber (int houseNumberPassed){             //int input
+        this.houseNumber = houseNumberPassed;
     }
     public void setStreet(String streetPassed){
-        if (streetPassed.equals(""))
-            this.street = "'NULL'";
-        else this.street = streetPassed;
+        this.street = streetPassed;
     }
     public void setCityCounty(String cityCountyPassed){
-        if (cityCountyPassed.equals(""))
-            this.cityCounty = "'NULL'";
-        else this.cityCounty = cityCountyPassed;
+        this.cityCounty = cityCountyPassed;
     }
     public void setStateAbb(Object stateAbbPassed){
         try{
@@ -72,22 +67,19 @@ public class Person {
         }
     }
     public void setZipCode(String zipCodePassed){
-        if (zipCodePassed.equals(""))
-            this.zipCode = "'NULL'";
-        else this.zipCode = zipCodePassed;
+        this.zipCode = zipCodePassed;
     }
     public void setLastUpdatedBy(String lastUpdatedByPassed){
-        if (lastUpdatedByPassed.equals(""))
-            this.lastUpdatedBy = "'NULL'";
-        else this.lastUpdatedBy = lastUpdatedByPassed;
+        this.lastUpdatedBy = lastUpdatedByPassed;
     }
     public void setLastUpdated(String lastUpdatedPassed){
-        if (lastUpdatedPassed.equals(""))
-            this.lastUpdated = "'NULL'";
-        else this.lastUpdated = lastUpdatedPassed;
+        this.lastUpdated = lastUpdatedPassed;
     }
     
     //Getter Methods
+    public Person getPerson(){
+        return this;
+    }
     public String getFirstName(){
         return this.firstName;
     }

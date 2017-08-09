@@ -5,19 +5,31 @@ Zachary Curry
 
 On my honor, I have neither given nor received any unauthorized assistance on
 this academic work
+
+UPDATED 8/8/17 10:30pm
 */
 
-public class Contractor 
-    extends Person {
+public class Contractor extends Person {
     private int contractorID;
-    private static int contractorIDCount;
-    double fee;
+    private int contractorIDCount = 0;
+    private double fee;
 
     //Constructor
     public Contractor() {
         //Data Fields
-        contractorID = ++contractorIDCount;
+        contractorID = 0;
         fee = 0;
+        this.setFirstName("");
+        this.setLastName("");
+        this.setMiddleInitial("");
+        this.setHouseNumber(0);
+        this.setStreet("");
+        this.setCityCounty("");
+        this.setStateAbb("");
+        this.setCountryAbb("");
+        this.setZipCode("");
+        this.setLastUpdatedBy("");
+        this.setLastUpdated("");
     }
     
     //Setter Methods
@@ -34,7 +46,7 @@ public class Contractor
     public Integer getContratorID(){
         return this.contractorID;
     }
-    public Double getFee(){ 
+    public double getFee(){ 
         return this.fee;
     }
 }
